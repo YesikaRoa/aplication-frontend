@@ -2,12 +2,12 @@ import React from 'react'
 import { CCard, CCardHeader, CCardBody } from '@coreui/react'
 import { DocsLink } from 'src/components'
 
-const Typography = () => {
+const Users = () => {
   return (
     <>
       <CCard className="mb-4">
         <CCardHeader>
-          Headings
+          Users
           <DocsLink href="https://coreui.io/docs/content/typography/" />
         </CCardHeader>
         <CCardBody>
@@ -226,4 +226,4 @@ const Typography = () => {
   )
 }
 
-export default Typography
+export default Users
