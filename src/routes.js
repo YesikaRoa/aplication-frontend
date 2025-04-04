@@ -3,8 +3,8 @@ import React from 'react'
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Users = React.lazy(() => import('./views/users/Users'))
 const Appointments = React.lazy(() => import('./views/appointments/Appointments'))
-const Professionls = React.lazy(() => import('./views/Professionals/professionals'))
-const Patients = React.lazy(() => import('./views/Patients/patients'))
+const Professionls = React.lazy(() => import('./views/professionals/Professionals'))
+const Patients = React.lazy(() => import('./views/patients/Patients'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
