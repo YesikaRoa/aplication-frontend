@@ -105,14 +105,14 @@ const UserDetails = () => {
             <CFormInput
               type="text"
               id="firstName"
-              floatingLabel="first Name"
+              floatingLabel="First Name"
               defaultValue={user.first_name}
               className="mb-3"
             />
             <CFormInput
               type="text"
               id="lastName"
-              floatingLabel="last Name"
+              floatingLabel="Last Name"
               defaultValue={user.last_name}
               className="mb-3"
             />
