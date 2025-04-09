@@ -1,0 +1,108 @@
+[
+    {
+      "id": 1,
+      "name": "Carlos ",
+      "lastname": "perez",
+      "age": 35,
+      "gender": "Male",
+      "phone": "987654321",
+      "address":"seboruco",
+      "history": [
+        {
+          "date": "2024-03-15",
+          "diagnosis": "Chronic lower back pain",
+          "treatment": "Physiotherapy 3 sessions, assisted stretches"
+        },
+        {
+          "date": "2024-01-20",
+          "diagnosis": "Tendinitis in right shoulder",
+          "treatment": "Therapeutic ultrasound and specific exercises"
+        }
+      ],
+      "notes": [
+        {
+          "date": "2024-03-15",
+          "note": "Good initial response. Recommended to maintain stretching routine."
+        },
+        {
+          "date": "2024-03-18",
+          "note": "60% pain reduction. Local heat therapy added."
+        }
+      ],
+      "currentTreatments": [
+        {
+          "service": "Intensive lower back physiotherapy",
+          "frequency": "3 times per week",
+          "duration": "4 weeks",
+          "recommendations": "Avoid heavy lifting. Weekly post-treatment review."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Ana Torres",
+      "age": 28,
+      "gender": "Female",
+      "phone": "965432187",
+      "history": [
+        {
+          "date": "2024-04-01",
+          "diagnosis": "Muscle cervicalgia",
+          "treatment": "Massage therapy, electrostimulation, and moist heat"
+        },
+        {
+          "date": "2023-11-15",
+          "diagnosis": "Contracture in upper left trapezius",
+          "treatment": "Decontracting massage and mobility exercises"
+        }
+      ],
+      "notes": [
+        {
+          "date": "2024-04-01",
+          "note": "Pain when turning head. High muscle tension."
+        },
+        {
+          "date": "2024-04-05",
+          "note": "Notable improvement. Almost full range of motion."
+        }
+      ],
+      "currentTreatments": [
+        {
+          "service": "Cervical massages + assisted stretching",
+          "frequency": "Twice per week",
+          "duration": "3 weeks",
+          "recommendations": "Use orthopedic pillow. Perform daily posture exercises."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Julio Ramírez",
+      "age": 42,
+      "gender": "Male",
+      "phone": "912345678",
+      "history": [
+        {
+          "date": "2024-02-10",
+          "diagnosis": "Acute lower back pain",
+          "treatment": "Combined physiotherapy with electrostimulation"
+        }
+      ],
+      "notes": [
+        {
+          "date": "2024-02-12",
+          "note": "Slight improvement. Pain still present in the morning."
+        }
+      ],
+      "currentTreatments": [
+        {
+          "service": "Lower back rehabilitation",
+          "frequency": "3 sessions weekly",
+          "duration": "2 weeks",
+          "recommendations": "Avoid sitting for long periods. Use lumbar support belt at work."
+        }
+      ]
+    }
+  ]
+  
+  
