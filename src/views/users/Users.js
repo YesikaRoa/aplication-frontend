@@ -1,227 +1,228 @@
-import React from 'react'
-import { CCard, CCardHeader, CCardBody } from '@coreui/react'
-import { DocsLink } from 'src/components'
+import React, { useEffect, useState } from 'react'
+import UserFilter from '../../components/Filter'
+import ModalDelete from '../../components/ModalDelete'
+import ModalInformation from '../../components/ModalInformation'
 
-const Users = () => {
+import './styles/users.css'
+import './styles/filter.css'
+
+import {
+  CTable,
+  CTableBody,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableDataCell,
+  CAvatar,
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CButton,
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilPeople, cilPencil, cilInfo, cilTrash, cilUserPlus } from '@coreui/icons'
+import { useNavigate } from 'react-router-dom'
+
+export const Users = () => {
+  const navigate = useNavigate()
+
+  const [users, setUsers] = useState([])
+  const [filteredUsers, setFilteredUsers] = useState([])
+  const [filters, setFilters] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+  })
+  const [visible, setVisible] = useState(false)
+  const [infoVisible, setInfoVisible] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null)
+
+  const handleDelete = (user) => {
+    setVisible(true)
+  }
+  const handleInfo = (user) => {
+    setSelectedUser(user)
+    setInfoVisible(true)
+  }
+
+  const handleEdit = (user) => {
+    navigate(`/users/${user.id}`, { state: { user } })
+  }
+
+  // Construcción dinámica de los inputs
+  const dataFilter = Object.keys(filters).map((key) => ({
+    name: key,
+    label:
+      key === 'first_name'
+        ? 'First name'
+        : key === 'last_name'
+          ? 'Last name'
+          : key === 'email'
+            ? 'Email'
+            : key,
+    placeholder: `Buscar por ${key}`,
+    type: 'text',
+    value: filters[key],
+    onChange: (e) => setFilters((prev) => ({ ...prev, [key]: e.target.value })),
+  }))
+
+  const normalizeText = (text) =>
+    text
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // elimina acentos
+      .toLowerCase()
+
+  const handleFilter = () => {
+    const activeFilters = Object.keys(filters).filter((key) => filters[key].trim() !== '')
+
+    const filtered = users.filter((user) =>
+      activeFilters.every((key) => {
+        const userValue = user[key] ? normalizeText(user[key]) : ''
+        const filterValue = normalizeText(filters[key])
+        return userValue.startsWith(filterValue)
+      }),
+    )
+
+    setFilteredUsers(filtered)
+  }
+
+  const resetFilters = () => {
+    const resetValues = Object.keys(filters).reduce((acc, key) => {
+      acc[key] = ''
+      return acc
+    }, {})
+    setFilters(resetValues)
+    setFilteredUsers(users)
+  }
+
+  useEffect(() => {
+    fetch('http://localhost:8000/users')
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data)
+        setFilteredUsers(data)
+      })
+  }, [])
+
   return (
     <>
+      <div className="d-flex justify-content-end mb-3">
+        <CButton color="primary" onClick={() => console.log('Agregar usuario')}>
+          <CIcon icon={cilUserPlus} className="me-2" /> Add user
+        </CButton>
+      </div>
+
       <CCard className="mb-4">
-        <CCardHeader>
-          Users
-          <DocsLink href="https://coreui.io/docs/content/typography/" />
-        </CCardHeader>
-        <CCardBody>
-          <p>
-            Documentation and examples for Bootstrap typography, including global settings,
-            headings, body text, lists, and more.
-          </p>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Heading</th>
-                <th>Example</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h1&gt;&lt;/h1&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h1">h1. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h2&gt;&lt;/h2&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h2">h2. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h3&gt;&lt;/h3&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h3">h3. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h4&gt;&lt;/h4&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h4">h4. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h5&gt;&lt;/h5&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h5">h5. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h6&gt;&lt;/h6&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h6">h6. Bootstrap heading</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </CCardBody>
-      </CCard>
-      <CCard className="mb-4">
-        <CCardHeader>Headings</CCardHeader>
-        <CCardBody>
-          <p>
-            <code className="highlighter-rouge">.h1</code> through
-            <code className="highlighter-rouge">.h6</code>
-            classes are also available, for when you want to match the font styling of a heading but
-            cannot use the associated HTML element.
-          </p>
-          <div className="bd-example">
-            <p className="h1">h1. Bootstrap heading</p>
-            <p className="h2">h2. Bootstrap heading</p>
-            <p className="h3">h3. Bootstrap heading</p>
-            <p className="h4">h4. Bootstrap heading</p>
-            <p className="h5">h5. Bootstrap heading</p>
-            <p className="h6">h6. Bootstrap heading</p>
-          </div>
-        </CCardBody>
-      </CCard>
-      <CCard className="mb-4">
-        <div className="card-header">Display headings</div>
-        <div className="card-body">
-          <p>
-            Traditional heading elements are designed to work best in the meat of your page content.
-            When you need a heading to stand out, consider using a <strong>display heading</strong>
-            —a larger, slightly more opinionated heading style.
-          </p>
-          <div className="bd-example bd-example-type">
-            <table className="table">
-              <tbody>
-                <tr>
-                  <td>
-                    <span className="display-1">Display 1</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className="display-2">Display 2</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className="display-3">Display 3</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className="display-4">Display 4</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <CCardHeader>Users</CCardHeader>
+        <div className="filter-container">
+          <UserFilter onFilter={handleFilter} resetFilters={resetFilters} dataFilter={dataFilter} />
         </div>
-      </CCard>
-      <CCard className="mb-4">
-        <CCardHeader>Inline text elements</CCardHeader>
+
         <CCardBody>
-          <p>
-            Traditional heading elements are designed to work best in the meat of your page content.
-            When you need a heading to stand out, consider using a <strong>display heading</strong>
-            —a larger, slightly more opinionated heading style.
-          </p>
-          <div className="bd-example">
-            <p>
-              You can use the mark tag to <mark>highlight</mark> text.
-            </p>
-            <p>
-              <del>This line of text is meant to be treated as deleted text.</del>
-            </p>
-            <p>
-              <s>This line of text is meant to be treated as no longer accurate.</s>
-            </p>
-            <p>
-              <ins>This line of text is meant to be treated as an addition to the document.</ins>
-            </p>
-            <p>
-              <u>This line of text will render as underlined</u>
-            </p>
-            <p>
-              <small>This line of text is meant to be treated as fine print.</small>
-            </p>
-            <p>
-              <strong>This line rendered as bold text.</strong>
-            </p>
-            <p>
-              <em>This line rendered as italicized text.</em>
-            </p>
-          </div>
+          <CTable align="middle" className="mb-0 border" hover responsive>
+            <CTableHead className="text-nowrap">
+              <CTableRow>
+                <CTableHeaderCell className="avatar-header">
+                  <CIcon icon={cilPeople} />
+                </CTableHeaderCell>
+                <CTableHeaderCell className="table-header">First name</CTableHeaderCell>
+                <CTableHeaderCell className="table-header">Last name</CTableHeaderCell>
+                <CTableHeaderCell className="table-header">Email</CTableHeaderCell>
+                <CTableHeaderCell className="table-header">Rol</CTableHeaderCell>
+                <CTableHeaderCell className="table-header">Estado</CTableHeaderCell>
+                <CTableHeaderCell className="avatar-header">Actions</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {filteredUsers.length === 0 ? (
+                <CTableRow>
+                  <CTableDataCell colSpan={6} className="text-center">
+                    No hay usuarios disponibles
+                  </CTableDataCell>
+                </CTableRow>
+              ) : (
+                filteredUsers.map((user, index) => (
+                  <CTableRow key={index}>
+                    <CTableDataCell className="text-center">
+                      <CAvatar size="md" src={user.avatar} />
+                    </CTableDataCell>
+                    <CTableDataCell>{user.first_name}</CTableDataCell>
+                    <CTableDataCell>{user.last_name}</CTableDataCell>
+                    <CTableDataCell>{user.email}</CTableDataCell>
+                    <CTableDataCell>{user.role_id || 'Sin rol'}</CTableDataCell>
+                    <CTableDataCell>{user.status}</CTableDataCell>
+                    <CTableDataCell>
+                      <div className="d-flex gap-2 justify-content-center">
+                        <CButton color="primary" size="sm" onClick={() => handleEdit(user)}>
+                          <CIcon icon={cilPencil} />
+                        </CButton>
+                        <CButton color="danger" size="sm" onClick={() => handleDelete(user)}>
+                          <CIcon icon={cilTrash} style={{ '--ci-primary-color': 'white' }} />
+                        </CButton>
+                        <CButton color="info" size="sm" onClick={() => handleInfo(user)}>
+                          <CIcon icon={cilInfo} style={{ '--ci-primary-color': 'white' }} />
+                        </CButton>
+                      </div>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))
+              )}
+            </CTableBody>
+          </CTable>
         </CCardBody>
       </CCard>
-      <CCard className="mb-4">
-        <CCardHeader>Description list alignment</CCardHeader>
-        <CCardBody>
-          <p>
-            Align terms and descriptions horizontally by using our grid system’s predefined classes
-            (or semantic mixins). For longer terms, you can optionally add a{' '}
-            <code className="highlighter-rouge">.text-truncate</code> class to truncate the text
-            with an ellipsis.
-          </p>
-          <div className="bd-example">
-            <dl className="row">
-              <dt className="col-sm-3">Description lists</dt>
-              <dd className="col-sm-9">A description list is perfect for defining terms.</dd>
 
-              <dt className="col-sm-3">Euismod</dt>
-              <dd className="col-sm-9">
-                <p>
-                  Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.
-                </p>
-                <p>Donec id elit non mi porta gravida at eget metus.</p>
-              </dd>
-
-              <dt className="col-sm-3">Malesuada porta</dt>
-              <dd className="col-sm-9">Etiam porta sem malesuada magna mollis euismod.</dd>
-
-              <dt className="col-sm-3 text-truncate">Truncated term is truncated</dt>
-              <dd className="col-sm-9">
-                Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut
-                fermentum massa justo sit amet risus.
-              </dd>
-
-              <dt className="col-sm-3">Nesting</dt>
-              <dd className="col-sm-9">
-                <dl className="row">
-                  <dt className="col-sm-4">Nested definition list</dt>
-                  <dd className="col-sm-8">
-                    Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc.
-                  </dd>
-                </dl>
-              </dd>
-            </dl>
-          </div>
-        </CCardBody>
-      </CCard>
+      <ModalDelete
+        visible={visible}
+        onClose={() => setVisible(false)}
+        onConfirm={() => {
+          console.log('Eliminar acción esquematizada')
+          setVisible(false)
+        }}
+        title="Confirmar eliminación de usuario"
+        message="¿Estás seguro de que deseas eliminar este usuario?"
+      />
+      <ModalInformation
+        visible={infoVisible}
+        onClose={() => setInfoVisible(false)} // Cierra la modal
+        title="Información del usuario"
+        content={
+          selectedUser ? (
+            <div>
+              <p>
+                <strong>First Name:</strong> {selectedUser.first_name}
+              </p>
+              <p>
+                <strong>Last Name:</strong> {selectedUser.last_name}
+              </p>
+              <p>
+                <strong>Email:</strong> {selectedUser.email}
+              </p>
+              <p>
+                <strong>Address:</strong> {selectedUser.address || 'No address available'}
+              </p>
+              <p>
+                <strong>Phone:</strong> {selectedUser.phone || 'No phone available'}
+              </p>
+              <p>
+                <strong>Birth Date:</strong> {selectedUser.birth_date || 'No birth date available'}
+              </p>
+              <p>
+                <strong>Gender:</strong> {selectedUser.gender === 'F' ? 'Female' : 'Male'}
+              </p>
+              <p>
+                <strong>Role:</strong> {selectedUser.role_id || 'No role assigned'}
+              </p>
+              <p>
+                <strong>Status:</strong> {selectedUser.status}
+              </p>
+            </div>
+          ) : (
+            <p>No hay información disponible.</p>
+          )
+        }
+      />
     </>
   )
 }
