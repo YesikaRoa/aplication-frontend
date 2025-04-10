@@ -1,229 +1,237 @@
-import React from 'react'
-import { CCard, CCardHeader, CCardBody } from '@coreui/react'
-import { DocsLink } from 'src/components'
+import React, { useEffect, useState } from 'react'
+import professionalsData from '../../assets/data/professional.json'
+import {
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CButton,
+  CTable,
+  CTableBody,
+  CTableDataCell,
+  CTableHead,
+  CTableHeaderCell,
+  CTableRow,
+  CForm,
+  CFormInput,
+  CFormLabel,
+  CFormSwitch,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CAlert,
+  CAvatar,
+  CRow,
+  CCol,
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilUser, cilPen, cilTrash, cilPlus } from '@coreui/icons'
 
-const Professionls = () => {
+const Professionals = () => {
+  const [professionals, setProfessionals] = useState([])
+  const [form, setForm] = useState({
+    id: '',
+    name: '',
+    specialty: '',
+    email: '',
+    phone: '',
+    notifications: false,
+    photo: '',
+  })
+  const [isEditing, setIsEditing] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    setProfessionals(professionalsData)
+  }, [])
+
+  const openNewModal = () => {
+    setForm({
+      id: '',
+      name: '',
+      specialty: '',
+      email: '',
+      phone: '',
+      notifications: false,
+      photo: '',
+    })
+    setIsEditing(false)
+    setModalVisible(true)
+  }
+
+  const openEditModal = (professional) => {
+    setForm(professional)
+    setIsEditing(true)
+    setModalVisible(true)
+  }
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target
+    setForm({ ...form, [name]: type === 'checkbox' ? checked : value })
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (isEditing) {
+      setProfessionals((prev) => prev.map((p) => (p.id === form.id ? form : p)))
+      setMessage('Professional successfully updated')
+    } else {
+      const newProfessional = { ...form, id: Date.now() }
+      setProfessionals((prev) => [...prev, newProfessional])
+      setMessage('Professional successfully registered')
+    }
+    setModalVisible(false)
+    setForm({
+      id: '',
+      name: '',
+      specialty: '',
+      email: '',
+      phone: '',
+      notifications: false,
+      photo: '',
+    })
+    setIsEditing(false)
+  }
+
+  const handleDelete = (id) => {
+    setProfessionals((prev) => prev.filter((p) => p.id !== id))
+    setMessage('Professional successfully deleted')
+  }
+
   return (
-    <>
-      <CCard className="mb-4">
-        <CCardHeader>
-          Appointments
-          <DocsLink href="https://coreui.io/docs/content/typography/" />
-        </CCardHeader>
-        <CCardBody>
-          <p>
-            Documentation and examples for Bootstrap typography, including global settings,
-            headings, body text, lists, and more.
-          </p>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Heading</th>
-                <th>Example</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h1&gt;&lt;/h1&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h1">h1. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h2&gt;&lt;/h2&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h2">h2. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h3&gt;&lt;/h3&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h3">h3. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h4&gt;&lt;/h4&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h4">h4. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h5&gt;&lt;/h5&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h5">h5. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h6&gt;&lt;/h6&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h6">h6. Bootstrap heading</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </CCardBody>
-      </CCard>
-      <CCard className="mb-4">
-        <CCardHeader>Headings</CCardHeader>
-        <CCardBody>
-          <p>
-            <code className="highlighter-rouge">.h1</code> through
-            <code className="highlighter-rouge">.h6</code>
-            classes are also available, for when you want to match the font styling of a heading but
-            cannot use the associated HTML element.
-          </p>
-          <div className="bd-example">
-            <p className="h1">h1. Bootstrap heading</p>
-            <p className="h2">h2. Bootstrap heading</p>
-            <p className="h3">h3. Bootstrap heading</p>
-            <p className="h4">h4. Bootstrap heading</p>
-            <p className="h5">h5. Bootstrap heading</p>
-            <p className="h6">h6. Bootstrap heading</p>
-          </div>
-        </CCardBody>
-      </CCard>
-      <CCard className="mb-4">
-        <div className="card-header">Display headings</div>
-        <div className="card-body">
-          <p>
-            Traditional heading elements are designed to work best in the meat of your page content.
-            When you need a heading to stand out, consider using a <strong>display heading</strong>
-            —a larger, slightly more opinionated heading style.
-          </p>
-          <div className="bd-example bd-example-type">
-            <table className="table">
-              <tbody>
-                <tr>
-                  <td>
-                    <span className="display-1">Display 1</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className="display-2">Display 2</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className="display-3">Display 3</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className="display-4">Display 4</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </CCard>
-      <CCard className="mb-4">
-        <CCardHeader>Inline text elements</CCardHeader>
-        <CCardBody>
-          <p>
-            Traditional heading elements are designed to work best in the meat of your page content.
-            When you need a heading to stand out, consider using a <strong>display heading</strong>
-            —a larger, slightly more opinionated heading style.
-          </p>
-          <div className="bd-example">
-            <p>
-              You can use the mark tag to <mark>highlight</mark> text.
-            </p>
-            <p>
-              <del>This line of text is meant to be treated as deleted text.</del>
-            </p>
-            <p>
-              <s>This line of text is meant to be treated as no longer accurate.</s>
-            </p>
-            <p>
-              <ins>This line of text is meant to be treated as an addition to the document.</ins>
-            </p>
-            <p>
-              <u>This line of text will render as underlined</u>
-            </p>
-            <p>
-              <small>This line of text is meant to be treated as fine print.</small>
-            </p>
-            <p>
-              <strong>This line rendered as bold text.</strong>
-            </p>
-            <p>
-              <em>This line rendered as italicized text.</em>
-            </p>
-          </div>
-        </CCardBody>
-      </CCard>
-      <CCard className="mb-4">
-        <CCardHeader>Description list alignment</CCardHeader>
-        <CCardBody>
-          <p>
-            Align terms and descriptions horizontally by using our grid system’s predefined classes
-            (or semantic mixins). For longer terms, you can optionally add a{' '}
-            <code className="highlighter-rouge">.text-truncate</code> class to truncate the text
-            with an ellipsis.
-          </p>
-          <div className="bd-example">
-            <dl className="row">
-              <dt className="col-sm-3">Description lists</dt>
-              <dd className="col-sm-9">A description list is perfect for defining terms.</dd>
+    <CCard>
+      <CCardHeader>Professional Management</CCardHeader>
+      <CCardBody>
+        {message && <CAlert color="success">{message}</CAlert>}
 
-              <dt className="col-sm-3">Euismod</dt>
-              <dd className="col-sm-9">
-                <p>
-                  Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.
-                </p>
-                <p>Donec id elit non mi porta gravida at eget metus.</p>
-              </dd>
+        <CButton color="primary" className="mb-3" onClick={openNewModal}>
+          <CIcon icon={cilPlus} className="me-2" />
+          New Professional
+        </CButton>
 
-              <dt className="col-sm-3">Malesuada porta</dt>
-              <dd className="col-sm-9">Etiam porta sem malesuada magna mollis euismod.</dd>
+        <CTable hover responsive>
+          <CTableHead>
+            <CTableRow>
+              <CTableHeaderCell>ID</CTableHeaderCell>
+              <CTableHeaderCell>Name</CTableHeaderCell>
+              <CTableHeaderCell>Specialty</CTableHeaderCell>
+              <CTableHeaderCell>Email</CTableHeaderCell>
+              <CTableHeaderCell>Phone</CTableHeaderCell>
+              <CTableHeaderCell>Notifications</CTableHeaderCell>
+              <CTableHeaderCell>Photo</CTableHeaderCell>
+              <CTableHeaderCell>Actions</CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {professionals.map((p) => (
+              <CTableRow key={p.id}>
+                <CTableDataCell>{p.id}</CTableDataCell>
+                <CTableDataCell>{p.name}</CTableDataCell>
+                <CTableDataCell>{p.specialty}</CTableDataCell>
+                <CTableDataCell>{p.email}</CTableDataCell>
+                <CTableDataCell>{p.phone}</CTableDataCell>
+                <CTableDataCell>{p.notifications ? 'Yes' : 'No'}</CTableDataCell>
+                <CTableDataCell>
+                  <CAvatar
+                    src={new URL(`../../assets/images/avatars/${p.photo}`, import.meta.url).href}
+                    size="md"
+                  />
+                </CTableDataCell>
+                <CTableDataCell>
+                  <CButton
+                    size="sm"
+                    color="warning"
+                    className="me-2"
+                    onClick={() => openEditModal(p)}
+                  >
+                    <CIcon icon={cilPen} className="me-1" />
+                    Edit
+                  </CButton>
+                  <CButton size="sm" color="danger" onClick={() => handleDelete(p.id)}>
+                    <CIcon icon={cilTrash} className="me-1" />
+                    Delete
+                  </CButton>
+                </CTableDataCell>
+              </CTableRow>
+            ))}
+          </CTableBody>
+        </CTable>
 
-              <dt className="col-sm-3 text-truncate">Truncated term is truncated</dt>
-              <dd className="col-sm-9">
-                Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut
-                fermentum massa justo sit amet risus.
-              </dd>
-
-              <dt className="col-sm-3">Nesting</dt>
-              <dd className="col-sm-9">
-                <dl className="row">
-                  <dt className="col-sm-4">Nested definition list</dt>
-                  <dd className="col-sm-8">
-                    Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc.
-                  </dd>
-                </dl>
-              </dd>
-            </dl>
-          </div>
-        </CCardBody>
-      </CCard>
-    </>
+        <CModal visible={modalVisible} onClose={() => setModalVisible(false)}>
+          <CModalHeader>
+            <CModalTitle>{isEditing ? 'Edit Professional' : 'New Professional'}</CModalTitle>
+          </CModalHeader>
+          <CForm onSubmit={handleSubmit}>
+            <CModalBody>
+              <CRow className="mb-3">
+                <CCol md={6}>
+                  <CFormLabel>Name</CFormLabel>
+                  <CFormInput name="name" value={form.name} onChange={handleChange} required />
+                </CCol>
+                <CCol md={6}>
+                  <CFormLabel>Specialty</CFormLabel>
+                  <CFormInput
+                    name="specialty"
+                    value={form.specialty}
+                    onChange={handleChange}
+                    required
+                  />
+                </CCol>
+              </CRow>
+              <CRow className="mb-3">
+                <CCol md={6}>
+                  <CFormLabel>Email</CFormLabel>
+                  <CFormInput name="email" value={form.email} onChange={handleChange} required />
+                </CCol>
+                <CCol md={6}>
+                  <CFormLabel>Phone</CFormLabel>
+                  <CFormInput name="phone" value={form.phone} onChange={handleChange} required />
+                </CCol>
+              </CRow>
+              <CRow className="mb-3">
+                <CCol md={6}>
+                  <CFormLabel>Avatar</CFormLabel>
+                  <select
+                    className="form-select"
+                    name="photo"
+                    value={form.photo}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select an avatar</option>
+                    {[...Array(9)].map((_, i) => (
+                      <option key={i} value={`${i + 1}.jpg`}>
+                        Avatar {i + 1}
+                      </option>
+                    ))}
+                  </select>
+                </CCol>
+                <CCol md={6}>
+                  <CFormLabel>Notifications</CFormLabel>
+                  <CFormSwitch
+                    name="notifications"
+                    checked={form.notifications}
+                    onChange={handleChange}
+                    label="Enable alerts"
+                  />
+                </CCol>
+              </CRow>
+            </CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setModalVisible(false)}>
+                Cancel
+              </CButton>
+              <CButton type="submit" color={isEditing ? 'warning' : 'primary'}>
+                {isEditing ? 'Update' : 'Save'}
+              </CButton>
+            </CModalFooter>
+          </CForm>
+        </CModal>
+      </CCardBody>
+    </CCard>
   )
 }
 
-export default Professionls
+export default Professionals
