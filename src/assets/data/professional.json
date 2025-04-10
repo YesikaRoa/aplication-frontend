@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "Dr. Fernanda Ríos",
+    "specialty": "Sports Physiotherapy",
+    "email": "fernanda.rios@medipanel.com",
+    "phone": "999123456",
+    "biography": "Fernanda Ríos is a sports physiotherapist dedicated to enhancing athletes' performance. With expertise in muscle recovery, she has worked with sports professionals and promotes overall physical wellness",
+    "notifications": true,
+    "photo": "8.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Dr. Manuel Herrera",
+    "specialty": "Physical Therapy",
+    "email": "manuel.herrera@medipanel.com",
+    "phone": "988765432",
+    "biography": "is a physical therapist with over five years of experience in rehabilitation techniques. He specializes in improving mobility and strength for his patients, helping them achieve long-term wellness.",
+    "notifications": false,
+    "photo": "2.jpg"
+  }
+]
