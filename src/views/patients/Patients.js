@@ -1,228 +1,294 @@
-import React from 'react'
-import { CCard, CCardHeader, CCardBody } from '@coreui/react'
-import { DocsLink } from 'src/components'
+import React, { useEffect, useState } from 'react'
+import patientsData from '../../assets/data/patients.json'
+import {
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CTable,
+  CTableBody,
+  CTableHead,
+  CTableHeaderCell,
+  CTableRow,
+  CTableDataCell,
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CForm,
+  CFormInput,
+  CAlert,
+  CRow,
+  CCol,
+  CCardTitle,
+  CCardText,
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilUserPlus, cilPencil, cilTrash, cilInfo, cilSave, cilXCircle } from '@coreui/icons'
 
 const Patients = () => {
+  const [patients, setPatients] = useState([])
+  const [form, setForm] = useState({ id: '', name: '', age: '', gender: '', phone: '' })
+  const [editing, setEditing] = useState(false)
+  const [showForm, setShowForm] = useState(false)
+  const [showDetail, setShowDetail] = useState(false)
+  const [detail, setDetail] = useState(null)
+  const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    setPatients(patientsData)
+  }, [])
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const openNewModal = () => {
+    setForm({ id: '', name: '', age: '', gender: '', phone: '' })
+    setEditing(false)
+    setShowForm(true)
+  }
+
+  const openEditModal = (patient) => {
+    setForm(patient)
+    setEditing(true)
+    setShowForm(true)
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (editing) {
+      setPatients((prev) =>
+        prev.map((p) => (p.id === form.id ? { ...form, id: Number(form.id) } : p)),
+      )
+      setMessage('Patient successfully edited')
+    } else {
+      const newPatient = {
+        ...form,
+        id: Date.now(),
+        history: [],
+        notes: [],
+        currentTreatments: [],
+      }
+      setPatients((prev) => [...prev, newPatient])
+      setMessage('Patient successfully added')
+    }
+    setForm({ id: '', name: '', age: '', gender: '', phone: '' })
+    setEditing(false)
+    setShowForm(false)
+  }
+
+  const handleDelete = (id) => {
+    setPatients((prev) => prev.filter((p) => p.id !== id))
+    setMessage('Patient successfully deleted')
+  }
+
+  const openDetail = (patient) => {
+    setDetail(patient)
+    setShowDetail(true)
+  }
+
   return (
-    <>
-      <CCard className="mb-4">
-        <CCardHeader>
-          Users
-          <DocsLink href="https://coreui.io/docs/content/typography/" />
-        </CCardHeader>
-        <CCardBody>
-          <p>
-            Documentation and examples for Bootstrap typography, including global settings,
-            headings, body text, lists, and more.
-          </p>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Heading</th>
-                <th>Example</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h1&gt;&lt;/h1&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h1">h1. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h2&gt;&lt;/h2&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h2">h2. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h3&gt;&lt;/h3&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h3">h3. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h4&gt;&lt;/h4&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h4">h4. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h5&gt;&lt;/h5&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h5">h5. Bootstrap heading</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <p>
-                    <code className="highlighter-rouge">&lt;h6&gt;&lt;/h6&gt;</code>
-                  </p>
-                </td>
-                <td>
-                  <span className="h6">h6. Bootstrap heading</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </CCardBody>
-      </CCard>
-      <CCard className="mb-4">
-        <CCardHeader>Headings</CCardHeader>
-        <CCardBody>
-          <p>
-            <code className="highlighter-rouge">.h1</code> through
-            <code className="highlighter-rouge">.h6</code>
-            classes are also available, for when you want to match the font styling of a heading but
-            cannot use the associated HTML element.
-          </p>
-          <div className="bd-example">
-            <p className="h1">h1. Bootstrap heading</p>
-            <p className="h2">h2. Bootstrap heading</p>
-            <p className="h3">h3. Bootstrap heading</p>
-            <p className="h4">h4. Bootstrap heading</p>
-            <p className="h5">h5. Bootstrap heading</p>
-            <p className="h6">h6. Bootstrap heading</p>
-          </div>
-        </CCardBody>
-      </CCard>
-      <CCard className="mb-4">
-        <div className="card-header">Display headings</div>
-        <div className="card-body">
-          <p>
-            Traditional heading elements are designed to work best in the meat of your page content.
-            When you need a heading to stand out, consider using a <strong>display heading</strong>
-            —a larger, slightly more opinionated heading style.
-          </p>
-          <div className="bd-example bd-example-type">
-            <table className="table">
-              <tbody>
-                <tr>
-                  <td>
-                    <span className="display-1">Display 1</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className="display-2">Display 2</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className="display-3">Display 3</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span className="display-4">Display 4</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </CCard>
-      <CCard className="mb-4">
-        <CCardHeader>Inline text elements</CCardHeader>
-        <CCardBody>
-          <p>
-            Traditional heading elements are designed to work best in the meat of your page content.
-            When you need a heading to stand out, consider using a <strong>display heading</strong>
-            —a larger, slightly more opinionated heading style.
-          </p>
-          <div className="bd-example">
-            <p>
-              You can use the mark tag to <mark>highlight</mark> text.
-            </p>
-            <p>
-              <del>This line of text is meant to be treated as deleted text.</del>
-            </p>
-            <p>
-              <s>This line of text is meant to be treated as no longer accurate.</s>
-            </p>
-            <p>
-              <ins>This line of text is meant to be treated as an addition to the document.</ins>
-            </p>
-            <p>
-              <u>This line of text will render as underlined</u>
-            </p>
-            <p>
-              <small>This line of text is meant to be treated as fine print.</small>
-            </p>
-            <p>
-              <strong>This line rendered as bold text.</strong>
-            </p>
-            <p>
-              <em>This line rendered as italicized text.</em>
-            </p>
-          </div>
-        </CCardBody>
-      </CCard>
-      <CCard className="mb-4">
-        <CCardHeader>Description list alignment</CCardHeader>
-        <CCardBody>
-          <p>
-            Align terms and descriptions horizontally by using our grid system’s predefined classes
-            (or semantic mixins). For longer terms, you can optionally add a{' '}
-            <code className="highlighter-rouge">.text-truncate</code> class to truncate the text
-            with an ellipsis.
-          </p>
-          <div className="bd-example">
-            <dl className="row">
-              <dt className="col-sm-3">Description lists</dt>
-              <dd className="col-sm-9">A description list is perfect for defining terms.</dd>
+    <CCard>
+      <CCardHeader className="fw-bold fs-5">Patient Management</CCardHeader>
+      <CCardBody>
+        {message && <CAlert color="success">{message}</CAlert>}
 
-              <dt className="col-sm-3">Euismod</dt>
-              <dd className="col-sm-9">
-                <p>
-                  Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.
-                </p>
-                <p>Donec id elit non mi porta gravida at eget metus.</p>
-              </dd>
+        <CButton color="primary" className="mb-4" onClick={openNewModal}>
+          <CIcon icon={cilUserPlus} className="me-2" />
+          New Patient
+        </CButton>
 
-              <dt className="col-sm-3">Malesuada porta</dt>
-              <dd className="col-sm-9">Etiam porta sem malesuada magna mollis euismod.</dd>
+        <CTable hover responsive>
+          <CTableHead>
+            <CTableRow>
+              <CTableHeaderCell>#</CTableHeaderCell>
+              <CTableHeaderCell>Name</CTableHeaderCell>
+              <CTableHeaderCell>Age</CTableHeaderCell>
+              <CTableHeaderCell>Gender</CTableHeaderCell>
+              <CTableHeaderCell>Phone</CTableHeaderCell>
+              <CTableHeaderCell>Actions</CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {patients.map((p) => (
+              <CTableRow key={p.id}>
+                <CTableDataCell>{p.id}</CTableDataCell>
+                <CTableDataCell>{p.name}</CTableDataCell>
+                <CTableDataCell>{p.age}</CTableDataCell>
+                <CTableDataCell>{p.gender}</CTableDataCell>
+                <CTableDataCell>{p.phone}</CTableDataCell>
+                <CTableDataCell>
+                  <CButton color="info" size="sm" className="me-2" onClick={() => openDetail(p)}>
+                    <CIcon icon={cilInfo} className="me-1" />
+                    Detail
+                  </CButton>
+                  <CButton
+                    color="warning"
+                    size="sm"
+                    className="me-2"
+                    onClick={() => openEditModal(p)}
+                  >
+                    <CIcon icon={cilPencil} className="me-1" />
+                    Edit
+                  </CButton>
+                  <CButton color="danger" size="sm" onClick={() => handleDelete(p.id)}>
+                    <CIcon icon={cilTrash} className="me-1" />
+                    Delete
+                  </CButton>
+                </CTableDataCell>
+              </CTableRow>
+            ))}
+          </CTableBody>
+        </CTable>
+      </CCardBody>
 
-              <dt className="col-sm-3 text-truncate">Truncated term is truncated</dt>
-              <dd className="col-sm-9">
-                Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut
-                fermentum massa justo sit amet risus.
-              </dd>
+      {/* Form Modal */}
+      <CModal visible={showForm} onClose={() => setShowForm(false)}>
+        <CModalHeader>
+          <CModalTitle>{editing ? 'Edit Patient' : 'New Patient'}</CModalTitle>
+        </CModalHeader>
+        <CForm onSubmit={handleSubmit}>
+          <CModalBody>
+            <CRow className="mb-3">
+              <CCol md={6}>
+                <CFormInput
+                  name="name"
+                  label="Name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                />
+              </CCol>
+              <CCol md={3}>
+                <CFormInput
+                  name="age"
+                  label="Age"
+                  type="number"
+                  value={form.age}
+                  onChange={handleChange}
+                  required
+                />
+              </CCol>
+              <CCol md={3}>
+                <CFormInput
+                  name="gender"
+                  label="Gender"
+                  value={form.gender}
+                  onChange={handleChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CFormInput
+              name="phone"
+              label="Phone"
+              value={form.phone}
+              onChange={handleChange}
+              required
+            />
+          </CModalBody>
+          <CModalFooter>
+            <CButton color="secondary" onClick={() => setShowForm(false)}>
+              <CIcon icon={cilXCircle} className="me-1" />
+              Cancel
+            </CButton>
+            <CButton type="submit" color={editing ? 'warning' : 'primary'}>
+              <CIcon icon={cilSave} className="me-1" />
+              {editing ? 'Update' : 'Save'}
+            </CButton>
+          </CModalFooter>
+        </CForm>
+      </CModal>
 
-              <dt className="col-sm-3">Nesting</dt>
-              <dd className="col-sm-9">
-                <dl className="row">
-                  <dt className="col-sm-4">Nested definition list</dt>
-                  <dd className="col-sm-8">
-                    Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc.
-                  </dd>
-                </dl>
-              </dd>
-            </dl>
-          </div>
-        </CCardBody>
-      </CCard>
-    </>
+      {/* Detail Modal */}
+      <CModal visible={showDetail} onClose={() => setShowDetail(false)} size="xl">
+        <CModalHeader>
+          <CModalTitle>Patient Details</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          {detail && (
+            <CRow>
+              <CCol md={4}>
+                <CCard className="mb-4">
+                  <CCardBody>
+                    <CCardTitle className="mb-3">{detail.name}</CCardTitle>
+                    <CCardText className="mb-1">
+                      <strong>Age:</strong> {detail.age}
+                    </CCardText>
+                    <CCardText className="mb-1">
+                      <strong>Gender:</strong> {detail.gender}
+                    </CCardText>
+                    <CCardText>
+                      <strong>Phone:</strong> {detail.phone}
+                    </CCardText>
+                  </CCardBody>
+                </CCard>
+              </CCol>
+              <CCol md={8}>
+                <CRow>
+                  <CCol md={12}>
+                    <h6 className="fw-bold mb-2">Medical History</h6>
+                    {detail.history.map((h, i) => (
+                      <CCard className="mb-2" key={i}>
+                        <CCardBody>
+                          <CCardText className="mb-1">
+                            <strong>{h.date}</strong>
+                          </CCardText>
+                          <CCardText className="mb-1">Diagnosis: {h.diagnosis}</CCardText>
+                          <CCardText>Treatment: {h.treatment}</CCardText>
+                        </CCardBody>
+                      </CCard>
+                    ))}
+                  </CCol>
+                  <CCol md={12}>
+                    <h6 className="fw-bold mt-4 mb-2">Professional Notes</h6>
+                    {detail.notes.map((n, i) => (
+                      <CCard className="mb-2" key={i}>
+                        <CCardBody>
+                          <CCardText className="mb-1">
+                            <strong>{n.date}</strong>
+                          </CCardText>
+                          <CCardText>{n.note}</CCardText>
+                        </CCardBody>
+                      </CCard>
+                    ))}
+                  </CCol>
+                  <CCol md={12}>
+                    <h6 className="fw-bold mt-4 mb-2">Current Treatments</h6>
+                    {detail.currentTreatments.map((t, i) => (
+                      <CCard className="mb-2" key={i}>
+                        <CCardBody>
+                          <CCardText>
+                            <strong>Service:</strong> {t.service}
+                          </CCardText>
+                          <CCardText>
+                            <strong>Frequency:</strong> {t.frequency}
+                          </CCardText>
+                          <CCardText>
+                            <strong>Duration:</strong> {t.duration}
+                          </CCardText>
+                          <CCardText>
+                            <strong>Recommendations:</strong> {t.recommendations}
+                          </CCardText>
+                        </CCardBody>
+                      </CCard>
+                    ))}
+                  </CCol>
+                </CRow>
+              </CCol>
+            </CRow>
+          )}
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setShowDetail(false)}>
+            <CIcon icon={cilXCircle} className="me-1" />
+            Close
+          </CButton>
+        </CModalFooter>
+      </CModal>
+    </CCard>
   )
 }
 
