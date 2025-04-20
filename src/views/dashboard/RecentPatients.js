@@ -45,7 +45,7 @@ const RecentPatientsTable = () => {
   return (
     <CCard className="space-component">
       <CCardHeader>
-        <h5>Tabla de Pacientes Recientes</h5>
+        <h5>Pacientes recientes</h5>
       </CCardHeader>
       <CCardBody>
         <CTable align="middle" className="mb-0 border" hover responsive>
