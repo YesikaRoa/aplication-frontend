@@ -33,14 +33,18 @@ const AppHeaderDropdown = () => {
   const handleLockAccount = () => {
     navigate('/login') // Redirige al login
   }
-
+  const handleProfileClick = () => {
+    navigate('/profile') // Redirige a la ruta del perfil
+  }
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
         <CAvatar src={avatar8} size="md" />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
-        <CDropdownItem href="#">
+        <CDropdownItem onClick={handleProfileClick}>
+          {' '}
+          {/* Cambia href por onClick */}
           <CIcon icon={cilUser} className="me-2" />
           Profile
         </CDropdownItem>
