@@ -21,10 +21,6 @@ const normalizeNameForURL = (name) => {
     .replace(/[^a-z0-9-]/g, '')
 }
 
-const capitalizeFirstLetter = (name) => {
-  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
-}
-
 const UserDetails = () => {
   const location = useLocation()
   const navigate = useNavigate()
