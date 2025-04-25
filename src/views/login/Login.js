@@ -18,6 +18,7 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import ModalSendInformation from '../../components/ModalSendInformation'
 import Notifications from '../../components/Notifications'
+import './styles/Login.css'
 
 const Login = () => {
   const [modalVisible, setModalVisible] = useState(false)
@@ -31,12 +32,12 @@ const Login = () => {
   }
 
   return (
-    <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
+    <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center login-background ">
       <CContainer>
         <CRow className="justify-content-center">
           <CCol md={8}>
-            <CCardGroup>
-              <CCard className="p-4">
+            <CCardGroup className="some-class">
+              <CCard className="p-4 ">
                 <CCardBody>
                   {alert && (
                     <div className="mb-3">
