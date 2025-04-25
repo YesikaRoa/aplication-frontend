@@ -5,13 +5,12 @@ import { CCard, CCardBody, CCardHeader, CRow, CCol } from '@coreui/react'
 import './Styles.css/ChartsSection.css'
 
 const ChartsSection = () => {
-  const doughnutRef = useRef(null)
-  const pieRef = useRef(null)
-  const barRef = useRef(null)
+  const doughnutRef1 = useRef(null)
+  const doughnutRef2 = useRef(null)
 
   useEffect(() => {
     const handleColorSchemeChange = () => {
-      ;[doughnutRef, pieRef, barRef].forEach((ref) => {
+      ;[doughnutRef1, doughnutRef2].forEach((ref) => {
         const chartInstance = ref.current
         if (chartInstance) {
           const { options } = chartInstance
@@ -30,7 +29,7 @@ const ChartsSection = () => {
     }
   }, [])
 
-  const doughnutData = {
+  const doughnutData1 = {
     labels: ['San Cristóbal', 'Táriba', 'Pueblo Nuevo', 'La Concordia'],
     datasets: [
       {
@@ -40,7 +39,7 @@ const ChartsSection = () => {
     ],
   }
 
-  const pieData = {
+  const doughnutData2 = {
     labels: ['Consulta General', 'Pediatría', 'Cardiología', 'Dermatología'],
     datasets: [
       {
@@ -69,7 +68,7 @@ const ChartsSection = () => {
             <CCardHeader style={{ fontWeight: 'bold' }}>Pacientes por ciudad</CCardHeader>
             <CCardBody>
               <div className="chart-wrapper">
-                <CChart type="doughnut" data={doughnutData} options={options} ref={doughnutRef} />
+                <CChart type="doughnut" data={doughnutData1} options={options} ref={doughnutRef1} />
               </div>
             </CCardBody>
           </CCard>
@@ -79,7 +78,7 @@ const ChartsSection = () => {
             <CCardHeader style={{ fontWeight: 'bold' }}>Especialidades más solicitadas</CCardHeader>
             <CCardBody>
               <div className="chart-wrapper">
-                <CChart type="doughnut" data={pieData} options={options} ref={doughnutRef} />
+                <CChart type="doughnut" data={doughnutData2} options={options} ref={doughnutRef2} />
               </div>
             </CCardBody>
           </CCard>
