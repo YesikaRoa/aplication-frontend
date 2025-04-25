@@ -74,6 +74,7 @@ const Appointments = () => {
 
     const filtered = appointments.filter((appointment) =>
       activeFilters.every((key) => {
+        // .every se asegura que todos los filtros son aplicados a una cita en especifico
         const appointmentValue = appointment[key] ? normalizeText(appointment[key]) : ''
         const filterValue = normalizeText(filters[key])
         return appointmentValue.startsWith(filterValue)
