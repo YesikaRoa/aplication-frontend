@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import UserFilter from '../../components/Filter'
 import ModalDelete from '../../components/ModalDelete'
 import ModalInformation from '../../components/ModalInformation'
-
+import ModalAdd from '../../components/ModalAdd'
+import defaultAvatar from '../../assets/images/avatars/avatar.png'
 import './styles/users.css'
 import './styles/filter.css'
 
@@ -25,7 +26,6 @@ import { useNavigate } from 'react-router-dom'
 
 export const Users = () => {
   const navigate = useNavigate()
-
   const [users, setUsers] = useState([])
   const [filteredUsers, setFilteredUsers] = useState([])
   const [filters, setFilters] = useState({
@@ -36,6 +36,117 @@ export const Users = () => {
   const [visible, setVisible] = useState(false)
   const [infoVisible, setInfoVisible] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
+  const ModalAddRef = useRef()
+
+  const handleFinish = async (purpose, formData) => {
+    if (purpose === 'users') {
+      const formatDate = (date) => {
+        const [year, month, day] = date.split('-')
+        return `${day}/${month}/${year}`
+      }
+
+      const completeUser = {
+        id: Date.now(),
+        first_name: formData.first_name || '',
+        last_name: formData.last_name || '',
+        email: formData.email || '',
+        password: 'hashed_password_default',
+        address: formData.address || '',
+        phone: formData.phone || '',
+        birth_date: formData.birth_date
+          ? formatDate(formData.birth_date)
+          : 'No birth date available',
+        gender: formData.gender || '',
+        avatar: formData.avatar || defaultAvatar,
+        role_id: formData.role || 'No role assigned',
+        status: formData.status || 'Active',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+
+      // Hacer fetch con completeUser
+      await fetch('http://localhost:8000/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(completeUser),
+      })
+
+      setUsers((prev) => [...prev, completeUser])
+      setFilteredUsers((prev) => [...prev, completeUser])
+    }
+  }
+  const userSteps = [
+    {
+      fields: [
+        {
+          name: 'first_name',
+          label: 'First Name',
+          placeholder: 'Enter first name',
+          required: true,
+        },
+        { name: 'last_name', label: 'Last Name', placeholder: 'Enter last name', required: true },
+        {
+          name: 'birth_date',
+          label: 'Birth Date',
+          type: 'date', // Cambiar a texto
+          placeholder: '', // Placeholder para guiar al usuario
+          required: true,
+        },
+        {
+          name: 'gender',
+          label: 'Gender',
+          type: 'select',
+          required: true,
+          options: [
+            { label: 'Female', value: 'F' },
+            { label: 'Male', value: 'M' },
+          ],
+        },
+      ],
+    },
+    {
+      fields: [
+        {
+          name: 'email',
+          label: 'Email',
+          type: 'email',
+          placeholder: 'Enter email',
+          required: true,
+        },
+        { name: 'phone', label: 'Phone', placeholder: 'Enter phone number' },
+        { name: 'address', label: 'Address', placeholder: 'Enter address' },
+      ],
+    },
+    {
+      fields: [
+        {
+          name: 'role',
+          label: 'Role',
+          type: 'select', // Cambiado a tipo select
+          required: true,
+          options: [
+            { label: 'Admin', value: 'Admin' },
+            { label: 'Patient', value: 'Patient' },
+            { label: 'Professional', value: 'Professional' },
+          ],
+        },
+        {
+          name: 'status',
+          label: 'Status',
+          type: 'select', // Cambiado a tipo select
+          required: true,
+          options: [
+            { label: 'Active', value: 'Active' },
+            { label: 'Inactive', value: 'Inactive' },
+          ],
+        },
+      ],
+    },
+  ]
+
+  const addUser = () => {
+    ModalAddRef.current.open()
+  }
 
   const handleDelete = (user) => {
     setVisible(true)
@@ -46,6 +157,7 @@ export const Users = () => {
   }
 
   const handleEdit = (user) => {
+    localStorage.setItem('selectedUser', JSON.stringify(user))
     navigate(`/users/${user.id}`, { state: { user } })
   }
 
@@ -108,7 +220,7 @@ export const Users = () => {
   return (
     <>
       <div className="d-flex justify-content-end mb-3">
-        <CButton color="primary" onClick={() => console.log('Agregar usuario')}>
+        <CButton color="primary" onClick={() => addUser()}>
           <CIcon icon={cilUserPlus} className="me-2" /> Add user
         </CButton>
       </div>
@@ -145,7 +257,7 @@ export const Users = () => {
                 filteredUsers.map((user, index) => (
                   <CTableRow key={index}>
                     <CTableDataCell className="text-center">
-                      <CAvatar size="md" src={user.avatar} />
+                      <CAvatar size="md" src={user.avatar || defaultAvatar} />
                     </CTableDataCell>
                     <CTableDataCell>{user.first_name}</CTableDataCell>
                     <CTableDataCell>{user.last_name}</CTableDataCell>
@@ -222,6 +334,13 @@ export const Users = () => {
             <p>No hay información disponible.</p>
           )
         }
+      />
+      <ModalAdd
+        ref={ModalAddRef}
+        title="Add new user"
+        steps={userSteps}
+        onFinish={handleFinish}
+        purpose="users"
       />
     </>
   )

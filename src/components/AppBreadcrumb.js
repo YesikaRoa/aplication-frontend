@@ -46,10 +46,24 @@ const AppBreadcrumb = () => {
 
   if (isUserDetailsPage) {
     const userId = pathname.split('/')[2]
-    const user = JSON.parse(localStorage.getItem('selectedUser')) // Obtenemos del localStorage
-    const firstName = user ? user.first_name.split(' ')[0] : `User ${userId}`
+    const storedUser = localStorage.getItem('selectedUser')
+    let firstName = null
+
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser)
+        firstName = user?.first_name?.split(' ')[0] || `User ${userId}`
+      } catch (e) {
+        console.error('Error parsing selectedUser from localStorage:', e)
+        firstName = `User ${userId}`
+      }
+    } else {
+      firstName = `User ${userId}`
+    }
+
     userName = capitalizeFirstLetter(firstName)
   }
+
   return (
     <CBreadcrumb className="my-0">
       <CBreadcrumbItem href="/">Home</CBreadcrumbItem>

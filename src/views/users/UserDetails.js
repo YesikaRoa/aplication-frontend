@@ -26,6 +26,17 @@ const UserDetails = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [fieldsDisabled, setFieldsDisabled] = useState(true)
+
+  const handleFieldsDisabled = () => {
+    setFieldsDisabled(!fieldsDisabled)
+  }
+
+  const save = () => {
+    // Aquí puedes agregar la lógica para guardar los cambios
+    console.log('Guardando cambios...')
+    handleFieldsDisabled()
+  }
 
   useEffect(() => {
     setUser(null)
@@ -104,6 +115,7 @@ const UserDetails = () => {
               floatingLabel="First Name"
               defaultValue={user.first_name}
               className="mb-3"
+              disabled={fieldsDisabled}
             />
             <CFormInput
               type="text"
@@ -111,6 +123,7 @@ const UserDetails = () => {
               floatingLabel="Last Name"
               defaultValue={user.last_name}
               className="mb-3"
+              disabled={fieldsDisabled}
             />
             <CFormInput
               type="email"
@@ -118,6 +131,7 @@ const UserDetails = () => {
               floatingLabel="Email"
               defaultValue={user.email}
               className="mb-3"
+              disabled={fieldsDisabled}
             />
             <CFormInput
               type="text"
@@ -125,6 +139,7 @@ const UserDetails = () => {
               floatingLabel="Address"
               defaultValue={user.address}
               className="mb-3"
+              disabled={fieldsDisabled}
             />
             <CFormInput
               type="text"
@@ -132,8 +147,12 @@ const UserDetails = () => {
               floatingLabel="Phone"
               defaultValue={user.phone}
               className="mb-3"
+              disabled={fieldsDisabled}
             />
-            <CButton color="primary">Save changes</CButton>
+            <CButton color="primary" onClick={fieldsDisabled ? handleFieldsDisabled : save}>
+              {' '}
+              {fieldsDisabled ? 'Edit' : 'Save'}
+            </CButton>
           </CCardBody>
         </CCard>
       </CCol>
