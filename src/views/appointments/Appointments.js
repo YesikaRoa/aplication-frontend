@@ -7,7 +7,7 @@ import './styles/appointments.css'
 import '../users/styles/filter.css'
 import '../users/styles/users.css'
 import { formatDate } from '../../utils/dateUtils'
-import { CCalendar } from '@coreui/react-pro'
+
 import {
   CTable,
   CTableBody,

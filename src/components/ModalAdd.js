@@ -94,10 +94,11 @@ const ModalAdd = forwardRef(({ title = 'Formulario', steps = [], onFinish, purpo
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
-    } else {
-      onFinish && onFinish(purpose, formData)
-      setVisible(false)
+      return
     }
+
+    onFinish && onFinish(purpose, formData)
+    setVisible(false)
   }
 
   const currentStep = steps[stepIndex] || {}

@@ -4,6 +4,8 @@ import ModalDelete from '../../components/ModalDelete'
 import ModalInformation from '../../components/ModalInformation'
 import ModalAdd from '../../components/ModalAdd'
 import defaultAvatar from '../../assets/images/avatars/avatar.png'
+import Notifications from '../../components/Notifications'
+
 import './styles/users.css'
 import './styles/filter.css'
 
@@ -19,6 +21,7 @@ import {
   CCardBody,
   CCardHeader,
   CButton,
+  CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPeople, cilPencil, cilInfo, cilTrash, cilUserPlus } from '@coreui/icons'
@@ -32,11 +35,15 @@ export const Users = () => {
     first_name: '',
     last_name: '',
     email: '',
+    role_id: '',
+    status: '',
   })
   const [visible, setVisible] = useState(false)
   const [infoVisible, setInfoVisible] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
   const ModalAddRef = useRef()
+  const [alert, setAlert] = useState(null)
+  const [userToDelete, setUserToDelete] = useState(null)
 
   const handleFinish = async (purpose, formData) => {
     if (purpose === 'users') {
@@ -46,7 +53,6 @@ export const Users = () => {
       }
 
       const completeUser = {
-        id: Date.now(),
         first_name: formData.first_name || '',
         last_name: formData.last_name || '',
         email: formData.email || '',
@@ -65,14 +71,17 @@ export const Users = () => {
       }
 
       // Hacer fetch con completeUser
-      await fetch('http://localhost:8000/users', {
+      const response = await fetch('http://localhost:8000/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(completeUser),
       })
 
-      setUsers((prev) => [...prev, completeUser])
-      setFilteredUsers((prev) => [...prev, completeUser])
+      const savedUser = await response.json()
+
+      // Usa el usuario real del backend
+      setUsers((prev) => [...prev, { ...savedUser }])
+      setFilteredUsers((prev) => [...prev, { ...savedUser }])
     }
   }
   const userSteps = [
@@ -148,8 +157,43 @@ export const Users = () => {
     ModalAddRef.current.open()
   }
 
-  const handleDelete = (user) => {
+  const handleDeleteClick = (user) => {
+    if (!user || !user.id) {
+      console.error('Invalid user selected for deletion.')
+      return
+    }
+    setUserToDelete(user)
     setVisible(true)
+  }
+
+  const confirmDelete = async () => {
+    if (userToDelete) {
+      try {
+        // Realiza la solicitud DELETE al backend
+        const response = await fetch(`http://localhost:8000/users/${userToDelete.id}`, {
+          method: 'DELETE',
+        })
+
+        if (response.ok) {
+          // Actualiza la lista de usuarios eliminando el usuario borrado
+          setUsers((prev) => prev.filter((u) => String(u.id) !== String(userToDelete.id)))
+          setFilteredUsers((prev) => prev.filter((u) => String(u.id) !== String(userToDelete.id)))
+
+          // Muestra una notificación de éxito
+          Notifications.showAlert(setAlert, 'User eliminado', 'success')
+        } else {
+          // Muestra una notificación de error
+          Notifications.showAlert(setAlert, 'Failed to delete the user. Please try again.', 'error')
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error)
+        // Muestra una notificación de error
+        Notifications.showAlert(setAlert, 'An error occurred while deleting the user.', 'error')
+      } finally {
+        setVisible(false) // Cierra la modal
+        setUserToDelete(null) // Limpia el usuario seleccionado
+      }
+    }
   }
   const handleInfo = (user) => {
     setSelectedUser(user)
@@ -162,27 +206,55 @@ export const Users = () => {
   }
 
   // Construcción dinámica de los inputs
-  const dataFilter = Object.keys(filters).map((key) => ({
-    name: key,
-    label:
-      key === 'first_name'
-        ? 'First name'
-        : key === 'last_name'
-          ? 'Last name'
-          : key === 'email'
-            ? 'Email'
-            : key,
-    placeholder: `Buscar por ${key}`,
-    type: 'text',
-    value: filters[key],
-    onChange: (e) => setFilters((prev) => ({ ...prev, [key]: e.target.value })),
-  }))
+  const dataFilter = Object.keys(filters).map((key) => {
+    let label
+    let type = 'text' // Por defecto, el tipo es 'text'
+    let options = [] // Opciones para los select
 
+    switch (key) {
+      case 'first_name':
+        label = 'First name'
+        break
+      case 'last_name':
+        label = 'Last name'
+        break
+      case 'role_id':
+        label = 'Role'
+        type = 'select' // Cambiar a tipo select
+        options = [
+          { label: 'Admin', value: 'Admin' },
+          { label: 'Patient', value: 'Patient' },
+          { label: 'Professional', value: 'Professional' },
+        ]
+        break
+      case 'status':
+        label = 'Status'
+        type = 'select' // Cambiar a tipo select
+        options = [
+          { label: 'Active', value: 'Active' },
+          { label: 'Inactive', value: 'Inactive' },
+        ]
+        break
+      default:
+        label = key.charAt(0).toUpperCase() + key.slice(1)
+    }
+
+    return {
+      name: key,
+      label,
+      placeholder: `Buscar por ${label}`,
+      type,
+      options, // Agregar las opciones si es un select
+      value: filters[key],
+      onChange: (e) => setFilters((prev) => ({ ...prev, [key]: e.target.value })),
+    }
+  })
   const normalizeText = (text) =>
     text
       .toString()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '') // elimina acentos
+      .trim() // elimina espacios adicionales
       .toLowerCase()
 
   const handleFilter = () => {
@@ -207,13 +279,16 @@ export const Users = () => {
     setFilters(resetValues)
     setFilteredUsers(users)
   }
-
   useEffect(() => {
     fetch('http://localhost:8000/users')
       .then((res) => res.json())
       .then((data) => {
-        setUsers(data)
-        setFilteredUsers(data)
+        const normalizedUsers = data.map((user) => ({
+          ...user,
+          id: String(user.id), // asegura que todos los IDs sean string
+        }))
+        setUsers(normalizedUsers)
+        setFilteredUsers(normalizedUsers)
       })
   }, [])
 
@@ -230,7 +305,22 @@ export const Users = () => {
         <div className="filter-container">
           <UserFilter onFilter={handleFilter} resetFilters={resetFilters} dataFilter={dataFilter} />
         </div>
-
+        {alert && (
+          <div className="mb-3">
+            <CAlert
+              color={alert.type}
+              className="text-center"
+              style={{
+                maxWidth: '400px',
+                margin: '0 auto',
+                fontSize: '14px',
+                padding: '5px',
+              }}
+            >
+              {alert.message}
+            </CAlert>
+          </div>
+        )}
         <CCardBody>
           <CTable align="middle" className="mb-0 border" hover responsive>
             <CTableHead className="text-nowrap">
@@ -242,7 +332,7 @@ export const Users = () => {
                 <CTableHeaderCell className="table-header">Last name</CTableHeaderCell>
                 <CTableHeaderCell className="table-header">Email</CTableHeaderCell>
                 <CTableHeaderCell className="table-header">Rol</CTableHeaderCell>
-                <CTableHeaderCell className="table-header">Estado</CTableHeaderCell>
+                <CTableHeaderCell className="table-header">Status</CTableHeaderCell>
                 <CTableHeaderCell className="avatar-header">Actions</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
@@ -269,7 +359,7 @@ export const Users = () => {
                         <CButton color="primary" size="sm" onClick={() => handleEdit(user)}>
                           <CIcon icon={cilPencil} />
                         </CButton>
-                        <CButton color="danger" size="sm" onClick={() => handleDelete(user)}>
+                        <CButton color="danger" size="sm" onClick={() => handleDeleteClick(user)}>
                           <CIcon icon={cilTrash} style={{ '--ci-primary-color': 'white' }} />
                         </CButton>
                         <CButton color="info" size="sm" onClick={() => handleInfo(user)}>
@@ -287,13 +377,13 @@ export const Users = () => {
 
       <ModalDelete
         visible={visible}
-        onClose={() => setVisible(false)}
-        onConfirm={() => {
-          console.log('Eliminar acción esquematizada')
+        onClose={() => {
           setVisible(false)
+          setUserToDelete(null) // Limpia el usuario seleccionado al cerrar la modal
         }}
+        onConfirm={confirmDelete}
         title="Confirmar eliminación de usuario"
-        message="¿Estás seguro de que deseas eliminar este usuario?"
+        message={`¿Estás seguro de que deseas eliminar a ${userToDelete?.first_name} ${userToDelete?.last_name}?`}
       />
       <ModalInformation
         visible={infoVisible}
