@@ -10,10 +10,10 @@ const ModalDelete = ({ visible, onClose, onConfirm, title, message }) => {
       <CModalBody>{message || '¿Estás seguro de que deseas eliminar este elemento?'}</CModalBody>
       <CModalFooter>
         <CButton color="secondary" onClick={onClose}>
-          Cancelar
+          Cancel
         </CButton>
         <CButton color="danger" onClick={onConfirm}>
-          Eliminar
+          Delete
         </CButton>
       </CModalFooter>
     </CModal>

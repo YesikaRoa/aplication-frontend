@@ -22,6 +22,7 @@ import {
   CCardHeader,
   CButton,
   CAlert,
+  CBadge,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPeople, cilPencil, cilInfo, cilTrash, cilUserPlus } from '@coreui/icons'
@@ -96,9 +97,9 @@ export const Users = () => {
         { name: 'last_name', label: 'Last Name', placeholder: 'Enter last name', required: true },
         {
           name: 'birth_date',
-          label: 'Birth Date',
           type: 'date', // Cambiar a texto
-          placeholder: '', // Placeholder para guiar al usuario
+          label: 'Birth Date',
+          placeholder: 'Enter birth date', // Placeholder para guiar al usuario
           required: true,
         },
         {
@@ -180,7 +181,7 @@ export const Users = () => {
           setFilteredUsers((prev) => prev.filter((u) => String(u.id) !== String(userToDelete.id)))
 
           // Muestra una notificación de éxito
-          Notifications.showAlert(setAlert, 'User eliminado', 'success')
+          Notifications.showAlert(setAlert, 'User deleted', 'success')
         } else {
           // Muestra una notificación de error
           Notifications.showAlert(setAlert, 'Failed to delete the user. Please try again.', 'error')
@@ -353,7 +354,12 @@ export const Users = () => {
                     <CTableDataCell>{user.last_name}</CTableDataCell>
                     <CTableDataCell>{user.email}</CTableDataCell>
                     <CTableDataCell>{user.role_id || 'Sin rol'}</CTableDataCell>
-                    <CTableDataCell>{user.status}</CTableDataCell>
+                    <CTableDataCell>
+                      {/* Usar CBadge para el estado */}
+                      <CBadge color={user.status === 'Active' ? 'success' : 'danger'}>
+                        {user.status}
+                      </CBadge>
+                    </CTableDataCell>
                     <CTableDataCell>
                       <div className="d-flex gap-2 justify-content-center">
                         <CButton color="primary" size="sm" onClick={() => handleEdit(user)}>
@@ -382,13 +388,13 @@ export const Users = () => {
           setUserToDelete(null) // Limpia el usuario seleccionado al cerrar la modal
         }}
         onConfirm={confirmDelete}
-        title="Confirmar eliminación de usuario"
-        message={`¿Estás seguro de que deseas eliminar a ${userToDelete?.first_name} ${userToDelete?.last_name}?`}
+        title="Confirm user deletion"
+        message={`Are you sure you want to remove ${userToDelete?.first_name} ${userToDelete?.last_name}?`}
       />
       <ModalInformation
         visible={infoVisible}
         onClose={() => setInfoVisible(false)} // Cierra la modal
-        title="Información del usuario"
+        title="User information"
         content={
           selectedUser ? (
             <div>
@@ -421,7 +427,7 @@ export const Users = () => {
               </p>
             </div>
           ) : (
-            <p>No hay información disponible.</p>
+            <p>No information available.</p>
           )
         }
       />

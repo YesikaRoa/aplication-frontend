@@ -16,7 +16,7 @@ const ModalInformation = ({ visible, onClose, title, content }) => {
       <CModalBody>{content || <p>No hay información disponible.</p>}</CModalBody>
       <CModalFooter>
         <CButton color="secondary" onClick={onClose}>
-          Cerrar
+          Close
         </CButton>
       </CModalFooter>
     </CModal>

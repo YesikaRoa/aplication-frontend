@@ -1,48 +1,22 @@
 .filter-container {
   display: flex;
-  align-items: center; /* Asegura que todos los elementos estén alineados verticalmente */
-  gap: 20px;
-  margin-bottom: 20px;
-  margin-top: 20px;
-  padding-left: 15px;
-}
-
-.filter-container label {
-  margin-right: 5px;
-}
-
-.filter-container .form-control {
-  width: 150px;
-}
-
-.filter-container .form-control:last-child {
-  width: 200px;
-}
-
-.filter-container .btn,
-.filter-container .reset-button {
-  height: 38px;
-  padding: 0 20px;
-  display: inline-block;
-  vertical-align: middle; /* Alineación vertical */
-}
-.filter-container {
-  display: flex;
   align-items: center;
   gap: 20px;
+  margin: 20px 0;
+  padding: 10px;
   flex-wrap: wrap;
-}
-
-.filter-input {
-  width: 200px;
+  align-content: flex-start;
 }
 
 .filter-buttons {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .search-button {
   height: 38px;
   padding: 0 20px;
+  min-width: 100px;
 }
