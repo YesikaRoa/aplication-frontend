@@ -12,26 +12,34 @@ import {
   CFormInput,
   CFormTextarea,
   CFormSelect,
+  CAlert,
+  CModal,
+  CModalBody,
+  CModalFooter,
+  CModalHeader,
+  CModalTitle,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilPencil, cilSave, cilTrash } from '@coreui/icons'
+import Notifications from '../../components/Notifications'
 
 const EditAppointment = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const [appointment, setAppointment] = useState(null) // only for display
-  const [editedAppointment, setEditedAppointment] = useState(null) // for editing
+  const [appointment, setAppointment] = useState(null)
+  const [editedAppointment, setEditedAppointment] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [fieldsDisabled, setFieldsDisabled] = useState(true)
+  const [alert, setAlert] = useState(null)
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false)
 
   useEffect(() => {
-    setAppointment(null)
-    setEditedAppointment(null)
     setLoading(true)
-
-    if (location.state && location.state.appointment) {
+    if (location.state?.appointment) {
       const newAppointment = location.state.appointment
       setAppointment(newAppointment)
-      setEditedAppointment({ ...newAppointment }) // clone for editing
+      setEditedAppointment({ ...newAppointment })
       localStorage.setItem('selectedAppointment', JSON.stringify(newAppointment))
-      setLoading(false)
     } else {
       const storedAppointment = localStorage.getItem('selectedAppointment')
       if (storedAppointment) {
@@ -39,28 +47,87 @@ const EditAppointment = () => {
         setAppointment(parsed)
         setEditedAppointment({ ...parsed })
       }
-      setLoading(false)
     }
+    setLoading(false)
   }, [location])
 
+  const handleFieldsDisabled = () => {
+    setFieldsDisabled(!fieldsDisabled)
+  }
+
+  const saveChanges = async () => {
+    if (!appointment || !appointment.id) {
+      console.error('The appointment ID is not valid.')
+      Notifications.showAlert(
+        setAlert,
+        'Cannot save because the appointment ID is not valid.',
+        'danger',
+      )
+      return
+    }
+    try {
+      const response = await fetch(`http://localhost:8000/appointments/${appointment.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editedAppointment),
+      })
+      if (response.ok) {
+        const updatedAppointment = await response.json()
+        setAppointment(updatedAppointment)
+        Notifications.showAlert(setAlert, 'Changes saved successfully!', 'success')
+      } else {
+        throw new Error('Error saving changes.')
+      }
+    } catch (error) {
+      console.error(error)
+      Notifications.showAlert(setAlert, 'There was an error saving the changes.', 'danger')
+    }
+    handleFieldsDisabled()
+  }
+
+  const deleteAppointment = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/appointments/${appointment.id}`, {
+        method: 'DELETE',
+      })
+      if (response.ok) {
+        Notifications.showAlert(setAlert, 'Appointment deleted successfully.', 'success', 5000)
+        setTimeout(() => {
+          navigate('/appointments') // Redirige después de 5 segundos
+        }, 5000) // Asegúrate de que coincida con la duración de la notificación
+      } else {
+        throw new Error('Error deleting the appointment.')
+      }
+    } catch (error) {
+      console.error(error)
+      Notifications.showAlert(setAlert, 'There was an error deleting the appointment.', 'danger')
+    }
+    setDeleteModalVisible(false)
+  }
+
   if (loading) return <p>Loading appointment...</p>
-  if (!appointment || !editedAppointment) return <p>Appointment not found.</p>
-
-  const handleSaveChanges = () => {
-    console.log('Updated data:')
-
-    navigate('/appointments') // Redirect to the appointment list
-  }
-
-  const handleInputChange = (e) => {
-    const { id, value } = e.target
-    setEditedAppointment((prev) => ({ ...prev, [id]: value }))
-  }
+  if (!appointment) return <p>Appointment not found.</p>
 
   return (
     <CRow>
       <CCol md={12}>
         <h3 className="mb-4">Edit Appointment</h3>
+        {alert && (
+          <div className="mb-3">
+            <CAlert
+              color={alert.type}
+              className="text-center"
+              style={{
+                maxWidth: '400px',
+                margin: '0 auto',
+                fontSize: '14px',
+                padding: '5px',
+              }}
+            >
+              {alert.message}
+            </CAlert>
+          </div>
+        )}
       </CCol>
       <CCol md={4}>
         <CCard>
@@ -69,85 +136,185 @@ const EditAppointment = () => {
             <CCardText>
               <strong>Professional:</strong> {appointment.professional} <br />
               <strong>Status:</strong> {appointment.status} <br />
-              <strong>Scheduled Date:</strong> {new Date(appointment.scheduled_at).toLocaleString()}{' '}
-              <br />
+              <strong>Date:</strong> {new Date(appointment.scheduled_at).toLocaleString()} <br />
               <strong>City:</strong> {appointment.city} <br />
               <strong>Reason:</strong> {appointment.reason_for_visit}
             </CCardText>
           </CCardBody>
         </CCard>
+        <CCard className="mt-3">
+          <CCardBody>
+            <CCardTitle className="text-primary">Change Status</CCardTitle>
+            <div className="mb-3">
+              <CFormSelect
+                id="quickStatusChange"
+                value={appointment.status}
+                onChange={async (e) => {
+                  const updatedStatus = e.target.value
+                  try {
+                    const updatedAppointment = { ...appointment, status: updatedStatus }
+                    const response = await fetch(
+                      `http://localhost:8000/appointments/${appointment.id}`,
+                      {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updatedAppointment),
+                      },
+                    )
+                    if (response.ok) {
+                      const result = await response.json()
+                      setAppointment(result)
+                      Notifications.showAlert(
+                        setAlert,
+                        `Status changed to ${updatedStatus}.`,
+                        'success',
+                      )
+                    } else {
+                      throw new Error('Error changing the appointment status.')
+                    }
+                  } catch (error) {
+                    console.error('Error changing status:', error)
+                    Notifications.showAlert(
+                      setAlert,
+                      'There was an error changing the appointment status.',
+                      'danger',
+                    )
+                  }
+                }}
+              >
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="canceled by professional">Canceled by professional</option>
+                <option value="canceled by patient">Canceled by patient</option>
+                <option value="completed">Completed</option>
+              </CFormSelect>
+            </div>
+            <CButton color="danger" onClick={() => setDeleteModalVisible(true)} className="mt-2">
+              <CIcon icon={cilTrash} className="me-2" />
+              Delete Appointment
+            </CButton>
+          </CCardBody>
+        </CCard>
       </CCol>
       <CCol md={8}>
-        <CCard>
+        <CCard className=" mb-4">
           <CCardBody>
-            <CCardTitle>Edit Appointment Information</CCardTitle>
+            <CCardTitle>Edit Information</CCardTitle>
             <CFormInput
               type="text"
               id="patient"
               floatingLabel="Patient"
               value={editedAppointment.patient}
-              onChange={handleInputChange}
+              onChange={(e) =>
+                setEditedAppointment({ ...editedAppointment, patient: e.target.value })
+              }
               className="mb-3"
+              disabled={fieldsDisabled}
             />
             <CFormInput
               type="text"
               id="professional"
               floatingLabel="Professional"
               value={editedAppointment.professional}
-              onChange={handleInputChange}
+              onChange={(e) =>
+                setEditedAppointment({ ...editedAppointment, professional: e.target.value })
+              }
               className="mb-3"
+              disabled={fieldsDisabled}
             />
             <CFormInput
               type="datetime-local"
               id="scheduled_at"
-              floatingLabel="Scheduled Date"
+              floatingLabel="Date"
               value={editedAppointment.scheduled_at}
-              onChange={handleInputChange}
+              onChange={(e) =>
+                setEditedAppointment({ ...editedAppointment, scheduled_at: e.target.value })
+              }
               className="mb-3"
-            />
-            <CFormTextarea
-              id="notes"
-              floatingLabel="Notes"
-              value={editedAppointment.notes}
-              onChange={handleInputChange}
-              className="mb-3"
-            />
-            <CFormInput
-              type="text"
-              id="city"
-              floatingLabel="City"
-              value={editedAppointment.city}
-              onChange={handleInputChange}
-              className="mb-3"
-            />
-            <CFormInput
-              type="text"
-              id="reason_for_visit"
-              floatingLabel="Reason for Visit"
-              value={editedAppointment.reason_for_visit}
-              onChange={handleInputChange}
-              className="mb-3"
+              disabled={fieldsDisabled}
             />
             <CFormSelect
               id="status"
               floatingLabel="Status"
               value={editedAppointment.status}
-              onChange={handleInputChange}
+              onChange={(e) =>
+                setEditedAppointment({ ...editedAppointment, status: e.target.value })
+              }
               className="mb-3"
+              disabled={fieldsDisabled}
             >
               <option value="pending">Pending</option>
               <option value="confirmed">Confirmed</option>
+              <option value="canceled by professional">Canceled by professional</option>
+              <option value="canceled by patient">Canceled by patient</option>
               <option value="completed">Completed</option>
-              <option value="canceled_by_patient">Canceled by Patient</option>
-              <option value="canceled_by_professional">Canceled by Professional</option>
             </CFormSelect>
-
-            <CButton color="primary" onClick={handleSaveChanges}>
-              Save Changes
+            <CFormInput
+              type="text"
+              id="city"
+              floatingLabel="City"
+              value={editedAppointment.city}
+              onChange={(e) => setEditedAppointment({ ...editedAppointment, city: e.target.value })}
+              className="mb-3"
+              disabled={fieldsDisabled}
+            />
+            <CFormInput
+              type="text"
+              id="pathology"
+              floatingLabel="Pathology"
+              value={editedAppointment.pathology}
+              onChange={(e) =>
+                setEditedAppointment({ ...editedAppointment, pathology: e.target.value })
+              }
+              className="mb-3"
+              disabled={fieldsDisabled}
+            />
+            <CFormTextarea
+              id="notes"
+              floatingLabel="Notes"
+              value={editedAppointment.notes}
+              onChange={(e) =>
+                setEditedAppointment({ ...editedAppointment, notes: e.target.value })
+              }
+              className="mb-3"
+              disabled={fieldsDisabled}
+            />
+            <CFormTextarea
+              id="reason_for_visit"
+              floatingLabel="Reason for Visit"
+              value={editedAppointment.reason_for_visit}
+              onChange={(e) =>
+                setEditedAppointment({ ...editedAppointment, reason_for_visit: e.target.value })
+              }
+              className="mb-3"
+              disabled={fieldsDisabled}
+            />
+            <CButton color="primary" onClick={fieldsDisabled ? handleFieldsDisabled : saveChanges}>
+              <CIcon icon={fieldsDisabled ? cilPencil : cilSave} className="me-2" />
+              {fieldsDisabled ? 'Edit' : 'Save'}
             </CButton>
           </CCardBody>
         </CCard>
       </CCol>
+
+      <CModal
+        alignment="center"
+        visible={deleteModalVisible}
+        onClose={() => setDeleteModalVisible(false)}
+      >
+        <CModalHeader>
+          <CModalTitle>Delete Appointment</CModalTitle>
+        </CModalHeader>
+        <CModalBody>Are you sure you want to delete this appointment?</CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setDeleteModalVisible(false)}>
+            Cancel
+          </CButton>
+          <CButton color="danger" onClick={deleteAppointment}>
+            Delete
+          </CButton>
+        </CModalFooter>
+      </CModal>
     </CRow>
   )
 }

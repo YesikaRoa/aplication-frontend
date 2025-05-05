@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import UserFilter from '../../components/Filter'
 import ModalDelete from '../../components/ModalDelete'
 import ModalInformation from '../../components/ModalInformation'
+import ModalAdd from '../../components/ModalAdd'
+import Notifications from '../../components/Notifications'
 
 import './styles/appointments.css'
 import '../users/styles/filter.css'
@@ -20,14 +22,15 @@ import {
   CCardHeader,
   CButton,
   CBadge,
+  CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilCalendar, cilPencil, cilInfo, cilTrash, cilPlus } from '@coreui/icons'
+import { cilPencil, cilInfo, cilTrash, cilPlus } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
 
 const Appointments = () => {
   const navigate = useNavigate()
-
+  const [alert, setAlert] = useState(null)
   const [appointments, setAppointments] = useState([])
   const [filteredAppointments, setFilteredAppointments] = useState([])
   const [filters, setFilters] = useState({
@@ -35,15 +38,132 @@ const Appointments = () => {
     professional: '',
     status: '',
     city: '',
+    startDate: null,
+    endDate: null,
   })
   const [visible, setVisible] = useState(false)
   const [infoVisible, setInfoVisible] = useState(false)
   const [selectedAppointment, setSelectedAppointment] = useState(null)
+  const [addVisible, setAddVisible] = useState(false)
+  const ModalAddRef = useRef()
 
-  const handleDelete = (appointment) => {
-    setVisible(true)
+  const appointmentSteps = [
+    {
+      fields: [
+        {
+          name: 'patient',
+          label: 'Patient',
+          placeholder: 'Enter patient name',
+          required: true,
+        },
+        {
+          name: 'professional',
+          label: 'Professional',
+          placeholder: 'Enter professional name',
+          required: true,
+        },
+        {
+          name: 'scheduled_at',
+          type: 'datetime-local',
+          label: 'Scheduled At',
+          placeholder: 'Select date and time',
+          required: true,
+        },
+      ],
+    },
+    {
+      fields: [
+        {
+          name: 'status',
+          label: 'Status',
+          type: 'select',
+          required: true,
+          options: [
+            { label: 'Pending', value: 'pending' },
+            { label: 'Confirmed', value: 'confirmed' },
+            { label: 'Completed', value: 'completed' },
+            { label: 'Canceled by patient', value: 'Canceled by patient' },
+            { label: 'Canceled by professional', value: 'Canceled by professional' },
+          ],
+        },
+        {
+          name: 'city',
+          label: 'City',
+          placeholder: 'Enter city',
+          required: true,
+        },
+        {
+          name: 'reason_for_visit',
+          label: 'Reason for Visit',
+          placeholder: 'Enter reason for visit',
+        },
+      ],
+    },
+    {
+      fields: [
+        {
+          name: 'notes',
+          label: 'Notes',
+          type: 'textarea',
+          placeholder: 'Enter additional notes',
+        },
+        {
+          name: 'pathology',
+          label: 'Pathology',
+          placeholder: 'Enter pathology (if any)',
+        },
+      ],
+    },
+  ]
+  const handleFinish = async (purpose, formData) => {
+    if (purpose === 'appointments') {
+      const newAppointment = {
+        ...formData,
+        id: String(Date.now()), // Generate a temporary unique ID
+        scheduled_at: formData.scheduled_at,
+        status: formData.status || 'pending',
+        city: formData.city || '',
+        notes: formData.notes || '',
+        pathology: formData.pathology || '',
+        reason_for_visit: formData.reason_for_visit || '',
+      }
+
+      // Simulate a backend call
+      const response = await fetch('http://localhost:8000/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newAppointment),
+      })
+
+      const savedAppointment = await response.json()
+
+      setAppointments((prev) => [...prev, savedAppointment])
+      setFilteredAppointments((prev) => [...prev, savedAppointment])
+    }
   }
 
+  const addAppointment = () => {
+    ModalAddRef.current.open()
+  }
+
+  const handleDelete = async (appointment) => {
+    try {
+      const response = await fetch(`http://localhost:8000/appointments/${appointment.id}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        Notifications.showAlert(setAlert, 'Appointment deleted successfully.', 'success', 5000)
+        setAppointments((prev) => prev.filter((a) => a.id !== appointment.id))
+        setFilteredAppointments((prev) => prev.filter((a) => a.id !== appointment.id))
+      } else {
+        throw new Error('Failed to delete the appointment.')
+      }
+    } catch (error) {
+      console.error('Error deleting appointment:', error)
+      Notifications.showAlert(setAlert, 'There was an error deleting the appointment.', 'danger')
+    }
+  }
   const handleInfo = (appointment) => {
     setSelectedAppointment(appointment)
     setInfoVisible(true)
@@ -52,16 +172,63 @@ const Appointments = () => {
   const handleEdit = (appointment) => {
     navigate(`/appointments/${appointment.id}`, { state: { appointment } })
   }
+  const dataFilter = Object.keys(filters).map((key) => {
+    let label
+    let type = 'text'
+    let options = []
 
-  const dataFilter = Object.keys(filters).map((key) => ({
-    name: key,
-    label: key.charAt(0).toUpperCase() + key.slice(1),
-    placeholder: `Buscar por ${key}`,
-    type: 'text',
-    value: filters[key],
-    onChange: (e) => setFilters((prev) => ({ ...prev, [key]: e.target.value })),
-  }))
+    switch (key) {
+      case 'startDate':
+      case 'endDate':
+        label = key === 'startDate' ? 'Start Date' : 'End Date'
+        type = 'date' // Cambiar el tipo a 'date'
+        break
+      case 'patient':
+        label = 'Patient'
+        break
+      case 'professional':
+        label = 'Professional'
+        break
+      case 'status':
+        label = 'Status'
+        type = 'select'
+        options = [
+          { label: 'Pending', value: 'pending' },
+          { label: 'Confirmed', value: 'confirmed' },
+          { label: 'Completed', value: 'completed' },
+          { label: 'Canceled by patient', value: 'Canceled by patient' },
+          { label: 'Canceled by professional', value: 'Canceled by professional' },
+        ]
+        break
+      case 'city':
+        label = 'City'
+        break
+      default:
+        label = key.charAt(0).toUpperCase() + key.slice(1)
+    }
 
+    return {
+      name: key,
+      label,
+      placeholder: `Search by ${label}`,
+      type,
+      options,
+      value:
+        key === 'startDate' || key === 'endDate'
+          ? filters[key] instanceof Date
+            ? filters[key].toISOString().split('T')[0] // Formatear fecha para el input
+            : ''
+          : filters[key] || '', // Asegúrate de que el valor no sea null o undefined
+      onChange: (e) => {
+        const value = e.target.value
+        setFilters((prev) => ({
+          ...prev,
+          [key]:
+            key === 'startDate' || key === 'endDate' ? (value ? new Date(value) : null) : value, // Convertir a Date si es necesario
+        }))
+      },
+    }
+  })
   const normalizeText = (text) =>
     text
       .toString()
@@ -70,16 +237,33 @@ const Appointments = () => {
       .toLowerCase()
 
   const handleFilter = () => {
-    const activeFilters = Object.keys(filters).filter((key) => filters[key].trim() !== '')
+    const { startDate, endDate, ...otherFilters } = filters
 
-    const filtered = appointments.filter((appointment) =>
-      activeFilters.every((key) => {
-        // .every se asegura que todos los filtros son aplicados a una cita en especifico
+    const activeFilters = Object.keys(otherFilters).filter((key) => otherFilters[key].trim() !== '')
+
+    const filtered = appointments.filter((appointment) => {
+      const appointmentDate = new Date(appointment.scheduled_at)
+
+      // Normalizar las fechas eliminando las horas
+      const normalizeDate = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
+
+      const normalizedAppointmentDate = normalizeDate(appointmentDate)
+      const normalizedStartDate = startDate ? normalizeDate(startDate) : null
+      const normalizedEndDate = endDate ? normalizeDate(endDate) : null
+
+      const startCondition = normalizedStartDate
+        ? normalizedAppointmentDate >= normalizedStartDate
+        : true
+      const endCondition = normalizedEndDate ? normalizedAppointmentDate <= normalizedEndDate : true
+
+      const otherConditions = activeFilters.every((key) => {
         const appointmentValue = appointment[key] ? normalizeText(appointment[key]) : ''
-        const filterValue = normalizeText(filters[key])
+        const filterValue = normalizeText(otherFilters[key])
         return appointmentValue.startsWith(filterValue)
-      }),
-    )
+      })
+
+      return startCondition && endCondition && otherConditions
+    })
 
     setFilteredAppointments(filtered)
   }
@@ -110,9 +294,9 @@ const Appointments = () => {
         return 'info'
       case 'completed':
         return 'success'
-      case 'canceled_by_patient':
+      case 'canceled by patient':
         return 'danger'
-      case 'canceled_by_professional':
+      case 'canceled by professional':
         return 'dark'
       default:
         return 'secondary'
@@ -122,7 +306,7 @@ const Appointments = () => {
   return (
     <>
       <div className="d-flex justify-content-end mb-3">
-        <CButton color="primary" onClick={() => console.log('Agregar cita')}>
+        <CButton color="primary" onClick={() => addAppointment()}>
           <CIcon icon={cilPlus} className="me-2" /> Add Appointment
         </CButton>
       </div>
@@ -132,7 +316,22 @@ const Appointments = () => {
         <div className="filter-container">
           <UserFilter onFilter={handleFilter} resetFilters={resetFilters} dataFilter={dataFilter} />
         </div>
-
+        {alert && (
+          <div className="mb-3">
+            <CAlert
+              color={alert.type}
+              className="text-center"
+              style={{
+                maxWidth: '400px',
+                margin: '0 auto',
+                fontSize: '14px',
+                padding: '5px',
+              }}
+            >
+              {alert.message}
+            </CAlert>
+          </div>
+        )}
         <CCardBody>
           <CTable align="middle" className="mb-0 border" hover responsive>
             <CTableHead className="text-nowrap">
@@ -149,7 +348,7 @@ const Appointments = () => {
               {filteredAppointments.length === 0 ? (
                 <CTableRow>
                   <CTableDataCell colSpan={6} className="text-center">
-                    No hay citas disponibles
+                    No appointments available
                   </CTableDataCell>
                 </CTableRow>
               ) : (
@@ -171,7 +370,14 @@ const Appointments = () => {
                         <CButton color="primary" size="sm" onClick={() => handleEdit(appointment)}>
                           <CIcon icon={cilPencil} />
                         </CButton>
-                        <CButton color="danger" size="sm" onClick={() => handleDelete(appointment)}>
+                        <CButton
+                          color="danger"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedAppointment(appointment) // Set the selected appointment
+                            setVisible(true) // Open the modal
+                          }}
+                        >
                           <CIcon icon={cilTrash} style={{ '--ci-primary-color': 'white' }} />
                         </CButton>
                         <CButton color="info" size="sm" onClick={() => handleInfo(appointment)}>
@@ -189,19 +395,21 @@ const Appointments = () => {
 
       <ModalDelete
         visible={visible}
-        onClose={() => setVisible(false)}
+        onClose={() => setVisible(false)} // Close the modal without deleting
         onConfirm={() => {
-          console.log('Eliminar acción esquematizada')
-          setVisible(false)
+          if (selectedAppointment) {
+            handleDelete(selectedAppointment) // Call handleDelete with the selected appointment
+          }
+          setVisible(false) // Close the modal after confirming
         }}
-        title="Confirmar eliminación de cita"
-        message="¿Estás seguro de que deseas eliminar esta cita?"
+        title="Confirm appointment deletion"
+        message="Are you sure you want to delete this appointment?"
       />
 
       <ModalInformation
         visible={infoVisible}
         onClose={() => setInfoVisible(false)}
-        title="Información de la cita"
+        title="Appointment Information"
         content={
           selectedAppointment ? (
             <div>
@@ -233,9 +441,16 @@ const Appointments = () => {
               </p>
             </div>
           ) : (
-            <p>No hay información disponible.</p>
+            <p>No information available.</p>
           )
         }
+      />
+      <ModalAdd
+        ref={ModalAddRef}
+        title="Add new appointment"
+        steps={appointmentSteps}
+        onFinish={handleFinish}
+        purpose="appointments"
       />
     </>
   )

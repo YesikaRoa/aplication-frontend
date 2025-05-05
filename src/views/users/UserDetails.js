@@ -85,11 +85,11 @@ const UserDetails = () => {
       if (putResponse.ok) {
         const result = await putResponse.json()
         setUser(result)
-        Notifications.showAlert(setAlert, '¡Cambios guardados exitosamente!', 'success')
+        Notifications.showAlert(setAlert, 'Changes successfully saved!', 'success')
       }
     } catch (error) {
-      console.error('Error al guardar los cambios:', error)
-      Notifications.showAlert(setAlert, 'Hubo un error al guardar los cambios.', 'danger')
+      console.error('Error saving changes:', error)
+      Notifications.showAlert(setAlert, 'There was an error saving the changes.', 'danger')
     }
 
     handleFieldsDisabled()
@@ -135,22 +135,22 @@ const UserDetails = () => {
       if (!res.ok) throw new Error('Usuario no encontrado.')
       const dbUser = await res.json()
       if (dbUser.password !== currentPassword) {
-        return Notifications.showAlert(setAlert, 'La contraseña actual es incorrecta.', 'danger')
+        return Notifications.showAlert(setAlert, 'The current password is incorrect.', 'danger')
       }
       const updateRes = await fetch(`http://localhost:8000/users/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...dbUser, password: newPassword }),
       })
-      if (!updateRes.ok) throw new Error('Error actualizando la contraseña.')
-      Notifications.showAlert(setAlert, 'Contraseña actualizada correctamente.', 'success')
+      if (!updateRes.ok) throw new Error('Error updating password.')
+      Notifications.showAlert(setAlert, 'Password updated correctly.', 'success')
       setShowChangePasswordModal(false)
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
     } catch (err) {
       console.error(err)
-      Notifications.showAlert(setAlert, 'Error al cambiar la contraseña.', 'danger')
+      Notifications.showAlert(setAlert, 'Error changing password.', 'danger')
     }
   }
 
@@ -323,8 +323,8 @@ const UserDetails = () => {
         visible={deleteModalVisible}
         onClose={() => setDeleteModalVisible(false)}
         onConfirm={handleDeleteUser}
-        title="Eliminar usuario"
-        message="¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer."
+        title="Delete user"
+        message="Are you sure you want to delete this user? This action cannot be undone."
       />
 
       <CModal
@@ -333,14 +333,14 @@ const UserDetails = () => {
         onClose={() => setShowChangePasswordModal(false)}
       >
         <CModalHeader>
-          <CModalTitle>Cambiar Contraseña</CModalTitle>
+          <CModalTitle>Change Password</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CForm>
             <CInputGroup className="mb-2">
               <CFormInput
                 type={showPasswords.current ? 'text' : 'password'}
-                placeholder="Contraseña actual"
+                placeholder="Current password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
               />
@@ -354,7 +354,7 @@ const UserDetails = () => {
             <CInputGroup className="mb-2">
               <CFormInput
                 type={showPasswords.new ? 'text' : 'password'}
-                placeholder="Nueva contraseña"
+                placeholder="New password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
@@ -368,7 +368,7 @@ const UserDetails = () => {
             <CInputGroup>
               <CFormInput
                 type={showPasswords.confirm ? 'text' : 'password'}
-                placeholder="Confirmar nueva contraseña"
+                placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
@@ -383,10 +383,10 @@ const UserDetails = () => {
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setShowChangePasswordModal(false)}>
-            Cancelar
+            Cancel
           </CButton>
           <CButton color="primary" onClick={handlePasswordChangeSubmit}>
-            Cambiar
+            Change Password
           </CButton>
         </CModalFooter>
       </CModal>

@@ -78,7 +78,7 @@ const ModalAdd = forwardRef(({ title = 'Formulario', steps = [], onFinish, purpo
   }
 
   const prevStep = () => {
-    if (stepIndex < 0) setStepIndex(stepIndex - 1)
+    if (stepIndex > 0) setStepIndex(stepIndex - 1)
   }
 
   const handleAdd = () => {
@@ -104,6 +104,9 @@ const ModalAdd = forwardRef(({ title = 'Formulario', steps = [], onFinish, purpo
   const currentStep = steps[stepIndex] || {}
 
   const renderInputs = () => {
+    if (!currentStep.fields) {
+      return null // Evitar error si currentStep.fields no está definido
+    }
     return currentStep.fields.map((field) => (
       <div key={field.name} style={{ marginBottom: '1rem' }}>
         {field.type === 'select' ? (
@@ -135,10 +138,11 @@ const ModalAdd = forwardRef(({ title = 'Formulario', steps = [], onFinish, purpo
             fullWidth
             margin="normal"
             InputLabelProps={{
-              shrink: formData[field.name] || field.type === 'date',
+              shrink:
+                !!formData[field.name] || field.type === 'datetime-local' || field.type === 'date', // Asegura que el label se mantenga arriba
             }}
             inputProps={{
-              placeholder: field.type === 'date' ? 'YYYY-MM-DD' : '',
+              placeholder: field.placeholder || '',
             }}
             error={!!errors[field.name]}
             helperText={errors[field.name]}
