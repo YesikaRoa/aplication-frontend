@@ -9,80 +9,95 @@ import {
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-  CAvatar,
+  CBadge,
 } from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import { cilPeople } from '@coreui/icons'
 import './../../scss/style.scss'
+
 const RecentPatientsTable = () => {
-  const [patients, setPatients] = useState([])
+  const [appointments, setAppointments] = useState([])
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAppointments = async () => {
       try {
-        const response = await fetch('http://localhost:8000/users')
+        const response = await fetch('http://localhost:8000/appointments')
         const data = await response.json()
-        const filteredPatients = data.filter((user) => user.role_id === 'Patient')
-        setPatients(filteredPatients)
+
+        // Get today's date and calculate the date 7 days ago
+        const today = new Date()
+        today.setHours(23, 59, 59, 999) // End of today
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(today.getDate() - 6) // Include today and the last 6 days
+        sevenDaysAgo.setHours(0, 0, 0, 0) // Start of 7 days ago
+
+        // Filter appointments strictly within the last 7 days, including today
+        const recentAppointments = data
+          .filter((appointment) => {
+            const appointmentDate = new Date(appointment.scheduled_at)
+            return appointmentDate >= sevenDaysAgo && appointmentDate <= today
+          })
+          .sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at)) // Sort by date
+          .slice(0, 10) // Limit to the first 10 appointments
+
+        setAppointments(recentAppointments)
       } catch (error) {
-        console.error('Error al cargar los datos:', error)
+        console.error('Error fetching data:', error)
       }
     }
-    fetchData()
+    fetchAppointments()
   }, [])
 
-  const calculateAge = (birthDate) => {
-    const today = new Date()
-    const birth = new Date(birthDate)
-    let age = today.getFullYear() - birth.getFullYear()
-    const monthDiff = today.getMonth() - birth.getMonth()
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'completed':
+        return <CBadge color="success">Completed</CBadge>
+      case 'pending':
+        return <CBadge color="warning">Pending</CBadge>
+      case 'confirmed':
+        return <CBadge color="primary">Confirmed</CBadge>
+      case 'canceled by professional':
+      case 'canceled by patient':
+        return <CBadge color="danger">Canceled</CBadge>
+      default:
+        return <CBadge color="secondary">Unknown</CBadge>
     }
-    return age
   }
 
   return (
     <CCard className="space-component">
       <CCardHeader>
-        <h5>Pacientes recientes</h5>
+        <h5>Recent Patients</h5>
+        <small className="text-muted">
+          Patients registered in appointments during the last week
+        </small>
       </CCardHeader>
       <CCardBody>
         <CTable align="middle" className="mb-0 border" hover responsive>
           <CTableHead className="text-nowrap">
             <CTableRow>
-              <CTableHeaderCell className="avatar-header text-center">
-                <CIcon icon={cilPeople} />
-              </CTableHeaderCell>
-              <CTableHeaderCell>Paciente</CTableHeaderCell>
-              <CTableHeaderCell>Edad</CTableHeaderCell>
-              <CTableHeaderCell>Ciudad</CTableHeaderCell>
-              <CTableHeaderCell>Última Cita</CTableHeaderCell>
-              <CTableHeaderCell>Especialidad Atendida</CTableHeaderCell>
+              <CTableHeaderCell>Patient</CTableHeaderCell>
+              <CTableHeaderCell>City</CTableHeaderCell>
+              <CTableHeaderCell>Appointment Date</CTableHeaderCell>
+              <CTableHeaderCell>Specialty</CTableHeaderCell>
+              <CTableHeaderCell>Status</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {patients.length === 0 ? (
+            {appointments.length === 0 ? (
               <CTableRow>
-                <CTableDataCell colSpan={6} className="text-center">
-                  No hay pacientes disponibles
+                <CTableDataCell colSpan={5} className="text-center">
+                  No appointments available
                 </CTableDataCell>
               </CTableRow>
             ) : (
-              patients.map((patient) => (
-                <CTableRow key={patient.id}>
-                  <CTableDataCell className="text-center">
-                    <CAvatar size="md" src={patient.avatar || 'default-avatar.png'} />
-                  </CTableDataCell>
-                  <CTableDataCell>{`${patient.first_name} ${patient.last_name}`}</CTableDataCell>
-                  <CTableDataCell>{calculateAge(patient.birth_date)}</CTableDataCell>
+              appointments.map((appointment) => (
+                <CTableRow key={appointment.id}>
+                  <CTableDataCell>{appointment.patient}</CTableDataCell>
+                  <CTableDataCell>{appointment.city || 'Unknown'}</CTableDataCell>
                   <CTableDataCell>
-                    {patient.address.split(',')[1]?.trim() || 'Desconocida'}
+                    {new Date(appointment.scheduled_at).toLocaleDateString()}
                   </CTableDataCell>
-                  <CTableDataCell>
-                    {new Date(patient.updated_at).toLocaleDateString()}
-                  </CTableDataCell>
-                  <CTableDataCell>{'Consulta General'}</CTableDataCell>
+                  <CTableDataCell>{appointment.specialty || 'N/A'}</CTableDataCell>
+                  <CTableDataCell>{getStatusBadge(appointment.status)}</CTableDataCell>
                 </CTableRow>
               ))
             )}

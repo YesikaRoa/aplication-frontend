@@ -249,15 +249,56 @@ const EditAppointment = () => {
               <option value="canceled by patient">Canceled by patient</option>
               <option value="completed">Completed</option>
             </CFormSelect>
-            <CFormInput
-              type="text"
+            <CFormSelect
               id="city"
               floatingLabel="City"
               value={editedAppointment.city}
               onChange={(e) => setEditedAppointment({ ...editedAppointment, city: e.target.value })}
               className="mb-3"
               disabled={fieldsDisabled}
-            />
+            >
+              <option value="San Cristóbal">San Cristóbal</option>
+              <option value="Táriba">Táriba</option>
+              <option value="La Fría">La Fría</option>
+              <option value="San Antonio del Táchira">San Antonio del Táchira</option>
+              <option value="Rubio">Rubio</option>
+              <option value="La Grita">La Grita</option>
+            </CFormSelect>
+            <CFormSelect
+              id="category"
+              floatingLabel="Category"
+              value={editedAppointment.category}
+              onChange={(e) =>
+                setEditedAppointment({ ...editedAppointment, category: e.target.value })
+              }
+              className="mb-3"
+              disabled={fieldsDisabled}
+            >
+              <option value="Consulta médica">Consulta médica</option>
+              <option value="Rehabilitación">Rehabilitación</option>
+              <option value="Emergencias">Emergencias</option>
+              <option value="Prevención">Prevención</option>
+              <option value="Atención de enfermería">Atención de enfermería</option>
+              <option value="Especialidad médica">Especialidad médica</option>
+            </CFormSelect>
+            <CFormSelect
+              id="specialty"
+              floatingLabel="Specialty"
+              value={editedAppointment.specialty}
+              onChange={(e) =>
+                setEditedAppointment({ ...editedAppointment, specialty: e.target.value })
+              }
+              className="mb-3"
+              disabled={fieldsDisabled}
+            >
+              <option value="Pediatría">Pediatría</option>
+              <option value="Fisioterapia">Fisioterapia</option>
+              <option value="Medicina Intensiva">Medicina Intensiva</option>
+              <option value="Medicina General">Medicina General</option>
+              <option value="Terapia Ocupacional">Terapia Ocupacional</option>
+              <option value="Enfermería">Enfermería</option>
+              <option value="Dermatología">Dermatología</option>
+            </CFormSelect>
             <CFormInput
               type="text"
               id="pathology"
