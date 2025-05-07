@@ -89,13 +89,45 @@ const Appointments = () => {
         {
           name: 'city',
           label: 'City',
-          placeholder: 'Enter city',
+          type: 'select',
           required: true,
+          options: [
+            { label: 'San Cristóbal', value: 'San Cristóbal' },
+            { label: 'Táriba', value: 'Táriba' },
+            { label: 'La Fría', value: 'La Fría' },
+            { label: 'San Antonio del Táchira', value: 'San Antonio del Táchira' },
+            { label: 'Rubio', value: 'Rubio' },
+            { label: 'La Grita', value: 'La Grita' },
+          ],
         },
         {
-          name: 'reason_for_visit',
-          label: 'Reason for Visit',
-          placeholder: 'Enter reason for visit',
+          name: 'category',
+          label: 'Category',
+          type: 'select',
+          required: true,
+          options: [
+            { label: 'Consulta médica', value: 'Consulta médica' },
+            { label: 'Rehabilitación', value: 'Rehabilitación' },
+            { label: 'Emergencias', value: 'Emergencias' },
+            { label: 'Prevención', value: 'Prevención' },
+            { label: 'Atención de enfermería', value: 'Atención de enfermería' },
+            { label: 'Especialidad médica', value: 'Especialidad médica' },
+          ],
+        },
+        {
+          name: 'specialty',
+          label: 'Specialty',
+          type: 'select',
+          required: true,
+          options: [
+            { label: 'Pediatría', value: 'Pediatría' },
+            { label: 'Fisioterapia', value: 'Fisioterapia' },
+            { label: 'Medicina Intensiva', value: 'Medicina Intensiva' },
+            { label: 'Medicina General', value: 'Medicina General' },
+            { label: 'Terapia Ocupacional', value: 'Terapia Ocupacional' },
+            { label: 'Enfermería', value: 'Enfermería' },
+            { label: 'Dermatología', value: 'Dermatología' },
+          ],
         },
       ],
     },
@@ -111,6 +143,11 @@ const Appointments = () => {
           name: 'pathology',
           label: 'Pathology',
           placeholder: 'Enter pathology (if any)',
+        },
+        {
+          name: 'reason_for_visit',
+          label: 'Reason for visit',
+          placeholder: 'Enter reason for visit',
         },
       ],
     },
@@ -429,6 +466,12 @@ const Appointments = () => {
                 <strong>City:</strong> {selectedAppointment.city}
               </p>
               <p>
+                <strong>Category:</strong> {selectedAppointment.category}
+              </p>
+              <p>
+                <strong>Specialty:</strong> {selectedAppointment.specialty}
+              </p>
+              <p>
                 <strong>Pathology:</strong>{' '}
                 {selectedAppointment.pathology || 'No pathology available'}
               </p>
@@ -445,6 +488,7 @@ const Appointments = () => {
           )
         }
       />
+
       <ModalAdd
         ref={ModalAddRef}
         title="Add new appointment"

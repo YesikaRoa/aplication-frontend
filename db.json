@@ -175,6 +175,22 @@
       "status": "Active",
       "created_at": "2023-01-10T10:00:00Z",
       "updated_at": "2024-01-10T10:00:00Z"
+    },
+    {
+      "id": "0ddc",
+      "first_name": "Yulieth",
+      "last_name": "Castro",
+      "email": "yroa1402@gmail.com",
+      "password": "hashed_password_default",
+      "address": "dwe",
+      "phone": "31233222222",
+      "birth_date": "05/05/2025",
+      "gender": "F",
+      "avatar": "/src/assets/images/avatars/avatar.png",
+      "role_id": "Patient",
+      "status": "Active",
+      "created_at": "2025-05-05T22:32:17.879Z",
+      "updated_at": "2025-05-05T22:32:17.879Z"
     }
   ],
   "appointments": [
@@ -190,14 +206,16 @@
       "has_medical_record": false,
       "city": "San Cristóbal",
       "reason_for_visit": "Consulta pediátrica",
+      "category": "Consulta médica",
       "ended_at": null,
-      "pathology": "Asma infantil"
+      "pathology": "Asma infantil",
+      "specialty": "Pediatría"
     },
     {
       "id": "2",
       "scheduled_at": "2025-04-26T10:30:00",
       "rescheduled_at": null,
-      "status": "confirmed",
+      "status": "completed",
       "canceled_at": null,
       "notes": "Revisión de movilidad. Se evaluará respuesta muscular tras accidente.",
       "patient": "María Fernández",
@@ -205,8 +223,10 @@
       "has_medical_record": true,
       "city": "Táriba",
       "reason_for_visit": "Terapia física",
+      "category": "Rehabilitación",
       "ended_at": null,
-      "pathology": "Lesión de ligamento cruzado"
+      "pathology": "Lesión de ligamento cruzado",
+      "specialty": "Fisioterapia"
     },
     {
       "id": "3",
@@ -220,8 +240,10 @@
       "has_medical_record": false,
       "city": "San Cristóbal",
       "reason_for_visit": "Cuidados intensivos",
+      "category": "Emergencias",
       "ended_at": null,
-      "pathology": "Insuficiencia respiratoria aguda"
+      "pathology": "Insuficiencia respiratoria aguda",
+      "specialty": "Medicina Intensiva"
     },
     {
       "id": "4",
@@ -235,8 +257,10 @@
       "has_medical_record": false,
       "city": "La Fría",
       "reason_for_visit": "Chequeo general",
+      "category": "Prevención",
       "ended_at": null,
-      "pathology": "Hipertensión leve"
+      "pathology": "Hipertensión leve",
+      "specialty": "Medicina General"
     },
     {
       "id": "5",
@@ -250,8 +274,10 @@
       "has_medical_record": false,
       "city": "San Cristóbal",
       "reason_for_visit": "Terapia ocupacional",
+      "category": "Rehabilitación",
       "ended_at": null,
-      "pathology": "Parálisis cerebral leve"
+      "pathology": "Parálisis cerebral leve",
+      "specialty": "Terapia Ocupacional"
     },
     {
       "id": "6",
@@ -265,8 +291,10 @@
       "has_medical_record": true,
       "city": "San Antonio del Táchira",
       "reason_for_visit": "Control de crecimiento",
+      "category": "Consulta médica",
       "ended_at": null,
-      "pathology": "Retraso en el crecimiento"
+      "pathology": "Retraso en el crecimiento",
+      "specialty": "Pediatría"
     },
     {
       "id": "7",
@@ -280,8 +308,10 @@
       "has_medical_record": false,
       "city": "Táriba",
       "reason_for_visit": "Fisioterapia",
+      "category": "Rehabilitación",
       "ended_at": null,
-      "pathology": "Fractura de tibia reciente"
+      "pathology": "Fractura de tibia reciente",
+      "specialty": "Fisioterapia"
     },
     {
       "id": "8",
@@ -295,8 +325,10 @@
       "has_medical_record": true,
       "city": "Rubio",
       "reason_for_visit": "Consulta de enfermería",
+      "category": "Atención de enfermería",
       "ended_at": null,
-      "pathology": "Diabetes tipo 2"
+      "pathology": "Diabetes tipo 2",
+      "specialty": "Enfermería"
     },
     {
       "id": "9",
@@ -310,14 +342,16 @@
       "has_medical_record": false,
       "city": "La Grita",
       "reason_for_visit": "Chequeo de rutina",
+      "category": "Prevención",
       "ended_at": null,
-      "pathology": "Asma moderada"
+      "pathology": "Asma moderada",
+      "specialty": "Medicina General"
     },
     {
       "id": "10",
-      "scheduled_at": "2025-05-01T16:00:00",
+      "scheduled_at": "2025-04-30T16:00",
       "rescheduled_at": null,
-      "status": "confirmed",
+      "status": "pending",
       "canceled_at": null,
       "notes": "Seguimiento de terapia. Se analizará rango de movilidad actual.",
       "patient": "Carlos Pérez",
@@ -325,27 +359,31 @@
       "has_medical_record": true,
       "city": "San Cristóbal",
       "reason_for_visit": "Terapia seguimiento",
+      "category": "Rehabilitación",
       "ended_at": null,
-      "pathology": "Escoliosis leve"
+      "pathology": "Escoliosis leve",
+      "specialty": "Terapia Física"
     },
     {
       "id": "11",
-      "scheduled_at": "2025-04-15T10:00:00",
+      "scheduled_at": "2025-05-01T10:00",
       "rescheduled_at": null,
-      "status": "completed",
+      "status": "canceled by professional",
       "canceled_at": null,
       "notes": "Sesión final para evaluar progreso en el tratamiento de tendinitis.",
       "patient": "Lucía Gómez",
       "professional": "Diego Martínez",
       "has_medical_record": true,
-      "city": "La Habana",
+      "city": "La Grita",
       "reason_for_visit": "Terapia física",
+      "category": "Rehabilitación",
       "ended_at": "2025-04-15T10:45:00",
-      "pathology": "Tendinitis crónica en hombro"
+      "pathology": "Tendinitis crónica en hombro",
+      "specialty": "Fisioterapia"
     },
     {
       "id": "12",
-      "scheduled_at": "2025-04-18T14:30:00",
+      "scheduled_at": "2025-05-03T14:30",
       "rescheduled_at": "2025-04-25T14:30:00",
       "status": "canceled by patient",
       "canceled_at": "2025-04-17T09:00:00",
@@ -355,12 +393,14 @@
       "has_medical_record": true,
       "city": "La Fría",
       "reason_for_visit": "Consulta inicial",
+      "category": "Consulta médica",
       "ended_at": null,
-      "pathology": "Hipertensión leve"
+      "pathology": "Hipertensión leve",
+      "specialty": "Medicina General"
     },
     {
       "id": "13",
-      "scheduled_at": "2025-04-18T14:30:00",
+      "scheduled_at": "2025-05-05T14:30",
       "rescheduled_at": "2025-04-25T14:30:00",
       "status": "confirmed",
       "canceled_at": "2025-04-17T09:00:00",
@@ -370,8 +410,10 @@
       "has_medical_record": true,
       "city": "La Grita",
       "reason_for_visit": "Dermatología",
+      "category": "Especialidad médica",
       "ended_at": null,
-      "pathology": "Dermatitis atópica"
+      "pathology": "Dermatitis atópica",
+      "specialty": "Dermatología"
     }
   ]
 }
