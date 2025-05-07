@@ -34,7 +34,7 @@
     },
     {
       "id": "3",
-      "first_name": "Pedro",
+      "first_name": "Pedroo",
       "last_name": "Ramírez",
       "email": "pedro.ramirez@example.com",
       "password": "hashed_password_3",
@@ -47,7 +47,7 @@
       "description": "Terapeuta con enfoque en rehabilitación física y mental.",
       "specialty": "Terapeuta",
       "subspecialty": "Fisioterapia",
-      "years_experience": 6,
+      "years_experience": "7",
       "status": "Inactive",
       "created_at": "2023-01-03T10:00:00Z",
       "updated_at": "2024-01-03T10:00:00Z"
