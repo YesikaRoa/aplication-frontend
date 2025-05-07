@@ -30,7 +30,8 @@ import avatar8 from './../../assets/images/avatars/8.jpg'
 const AppHeaderDropdown = () => {
   const navigate = useNavigate() // Inicializa useNavigate
 
-  const handleLockAccount = () => {
+  const handleLogout = () => {
+    localStorage.removeItem('authToken') // Elimina el token de autenticación
     navigate('/login') // Redirige al login
   }
   const handleProfileClick = () => {
@@ -49,9 +50,7 @@ const AppHeaderDropdown = () => {
           Profile
         </CDropdownItem>
         <CDropdownDivider />
-        <CDropdownItem onClick={handleLockAccount}>
-          {' '}
-          {/* Cambia href por onClick */}
+        <CDropdownItem onClick={handleLogout}>
           <CIcon icon={cilExitToApp} className="me-2" />
           Sign out
         </CDropdownItem>

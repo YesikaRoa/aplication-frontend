@@ -18,17 +18,103 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import ModalSendInformation from '../../components/ModalSendInformation'
 import Notifications from '../../components/Notifications'
+import emailjs from 'emailjs-com'
 import './styles/Login.css'
 
 const Login = () => {
   const [modalVisible, setModalVisible] = useState(false)
   const [alert, setAlert] = useState(null)
   const navigate = useNavigate()
-  const handleSendPassword = () => {
-    Notifications.showAlert(setAlert, 'La contraseña ha sido enviada.', 'success')
+
+  const handleSendPassword = async () => {
+    const emailInput = document.querySelector('#email-input').value
+
+    // Validar que el campo sea un email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(emailInput)) {
+      Notifications.showAlert(setAlert, 'Por favor, ingrese un correo válido.', 'danger')
+      return
+    }
+
+    try {
+      // Obtener datos del usuario desde db.json
+      const response = await fetch(`http://localhost:8000/users?email=${emailInput}`)
+      const users = await response.json()
+
+      if (users.length === 0) {
+        Notifications.showAlert(setAlert, 'El correo no está registrado.', 'danger')
+        return
+      }
+      if (users.length > 1) {
+        Notifications.showAlert(
+          setAlert,
+          'Hay múltiples cuentas con este correo. Contacte al soporte.',
+          'danger',
+        )
+        return
+      }
+
+      const user = users[0]
+
+      // Enviar correo con Email.js
+      const templateParams = {
+        to_email: user.email, // Correo del destinatario
+        to_name: `${user.first_name} ${user.last_name}`, // Nombre completo del destinatario
+        password: user.password, // Contraseña del usuario
+        from_name: 'MediPanel', // Nombre del remitente
+      }
+
+      await emailjs.send(
+        'service_tedn2sc', // Reemplaza con tu Service ID
+        'template_sjjfyk7', // Reemplaza con tu Template ID
+        templateParams,
+        '7Sv0ctCgjuz0NoPk3', // Reemplaza con tu Public Key
+      )
+
+      Notifications.showAlert(setAlert, 'La contraseña ha sido enviada a su correo.', 'success')
+      setModalVisible(false)
+    } catch (error) {
+      console.error('Error al enviar el correo:', error)
+      Notifications.showAlert(setAlert, 'Hubo un error al enviar el correo.', 'danger')
+    }
   }
-  const handleLogin = () => {
-    navigate('/dashboard')
+
+  const handleLogin = async () => {
+    const username = document.querySelector('#username-input').value
+    const password = document.querySelector('#password-input').value
+
+    if (!username || !password) {
+      Notifications.showAlert(setAlert, 'Por favor, complete todos los campos.', 'danger')
+      return
+    }
+
+    try {
+      // Obtener datos del usuario desde db.json
+      const response = await fetch(`http://localhost:8000/users?email=${username}`)
+      const users = await response.json()
+
+      if (users.length === 0) {
+        Notifications.showAlert(setAlert, 'No tienes una cuenta registrada.', 'danger')
+        return
+      }
+
+      const user = users[0]
+
+      if (user.password !== password) {
+        Notifications.showAlert(setAlert, 'Contraseña incorrecta.', 'danger')
+        return
+      }
+
+      // Si las credenciales son correctas, redirigir al dashboard
+      if (user.password === password) {
+        localStorage.setItem('authToken', 'your-auth-token') // Guarda un token de autenticación
+        navigate('/') // Redirige al layout principal
+        return
+      }
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error)
+      Notifications.showAlert(setAlert, 'Hubo un error al iniciar sesión.', 'danger')
+    }
   }
 
   return (
@@ -53,13 +139,18 @@ const Login = () => {
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput placeholder="Username" autoComplete="username" />
+                      <CFormInput
+                        id="username-input"
+                        placeholder="Username"
+                        autoComplete="username"
+                      />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
                         <CIcon icon={cilLockLocked} />
                       </CInputGroupText>
                       <CFormInput
+                        id="password-input"
                         type="password"
                         placeholder="Password"
                         autoComplete="current-password"
@@ -108,9 +199,16 @@ const Login = () => {
         visible={modalVisible}
         setVisible={setModalVisible}
         title="Recuperar Contraseña"
-        message="Su contraseña será enviada al correo registrado. Por favor, asegúrese de que su correo esté actualizado."
+        message="Ingrese su correo electrónico registrado para recibir su contraseña."
         onSend={handleSendPassword}
-      />
+      >
+        <CFormInput
+          id="email-input" // Este es el campo donde se ingresa el correo
+          type="email"
+          placeholder="Correo electrónico"
+          required
+        />
+      </ModalSendInformation>
     </div>
   )
 }
