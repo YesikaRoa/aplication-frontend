@@ -108,6 +108,7 @@ const Login = () => {
       // Si las credenciales son correctas, redirigir al dashboard
       if (user.password === password) {
         localStorage.setItem('authToken', 'your-auth-token') // Guarda un token de autenticación
+        localStorage.setItem('userId', user.id)
         navigate('/') // Redirige al layout principal
         return
       }

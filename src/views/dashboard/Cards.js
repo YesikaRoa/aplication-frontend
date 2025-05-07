@@ -111,9 +111,7 @@ const Cards = () => {
           <CCardBody>
             <div className="fs-3 fw-bold">{data.mostRequestedService}</div>
             <div className="text-uppercase">The most requested category</div>
-            <small className="text-muted" S>
-              Based on recent appointments
-            </small>
+            <small className="text-muted">Based on recent appointments</small>
           </CCardBody>
           <CIcon icon={cilListRich} size="xl" className="m-3 text-warning" />
         </CCard>

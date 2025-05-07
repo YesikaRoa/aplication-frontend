@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+
 import {
   CCard,
   CCardBody,
@@ -18,16 +19,54 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilSave, cilPencil, cilExitToApp } from '@coreui/icons'
-import './styles/Profile.css'
+import './styles/Profile.css' // Asegúrate de que la ruta sea correcta
 
 const Profile = () => {
   const [user, setUser] = useState(null)
   const [formData, setFormData] = useState({})
   const [modalVisible, setModalVisible] = useState(false)
+  const [selectedImage, setSelectedImage] = useState(null)
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      // Simula la ruta de la imagen cargada
+      const newImagePath = `src/assets/images/avatars/${file.name}`
+      console.log('Nueva ruta de la imagen:', newImagePath)
+      setSelectedImage(newImagePath) // Guarda la nueva ruta
+
+      // Actualiza la imagen en el servidor inmediatamente
+      const updatedData = { ...formData, avatar: newImagePath }
+      fetch(`http://localhost:8000/users/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Error al actualizar la imagen en el servidor')
+          }
+          return response.json()
+        })
+        .then((data) => {
+          console.log('Imagen actualizada en el servidor:', data)
+          setUser(data) // Actualiza el estado del usuario con los datos del servidor
+        })
+        .catch((error) => console.error('Error al guardar la imagen:', error))
+    }
+  }
 
   useEffect(() => {
+    const userId = localStorage.getItem('userId') // Obtén el ID del usuario autenticado
+    if (!userId) {
+      console.error('No user ID found in localStorage')
+      return
+    }
+
     // Fetch user data from the API
-    fetch('http://localhost:8000/users/1') // Replace "1" with the desired user ID
+    fetch(`http://localhost:8000/users/${userId}`)
       .then((response) => response.json())
       .then((data) => {
         setUser(data)
@@ -36,26 +75,38 @@ const Profile = () => {
       .catch((error) => console.error('Error fetching user data:', error))
   }, [])
 
+  useEffect(() => {
+    if (selectedImage) {
+      console.log('Imagen seleccionada actualizada:', selectedImage)
+    }
+  }, [selectedImage])
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
   }
 
   const handleSaveChanges = () => {
-    // Save changes to the API
+    const updatedData = { ...formData, avatar: selectedImage || user.avatar }
+    console.log('Datos enviados al servidor:', updatedData)
+
     fetch(`http://localhost:8000/users/${user.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify(updatedData),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        setUser(data)
-        setModalVisible(false) // Close the modal after saving
+      .then((response) => {
+        console.log('Estado de la respuesta:', response.status)
+        return response.json()
       })
-      .catch((error) => console.error('Error saving changes:', error))
+      .then((data) => {
+        console.log('Respuesta del servidor:', data)
+        setUser(data) // Actualiza el estado con los datos del servidor
+        setModalVisible(false) // Cierra el modal después de guardar
+      })
+      .catch((error) => console.error('Error al guardar los cambios:', error))
   }
 
   if (!user) {
@@ -63,20 +114,31 @@ const Profile = () => {
   }
 
   return (
-    <CCard>
+    <CCard className="space-component">
       <CCardBody>
         <div className="profile-container">
           <div className="profile-header">
             <div className="profile-avatar">
               <div className="avatar-container">
-                <img src={user.avatar} alt="User Avatar" className="avatar-image" />
+                <img
+                  src={selectedImage || user.avatar}
+                  alt="User Avatar"
+                  className="avatar-image"
+                />
                 <CButton
                   color="light"
                   className="edit-avatar-button"
-                  onClick={() => console.log('Edit avatar clicked')} // Aquí puedes abrir un modal o manejar la lógica de edición
+                  onClick={() => document.getElementById('file-input').click()}
                 >
                   <CIcon icon={cilPencil} />
                 </CButton>
+                <input
+                  type="file"
+                  id="file-input"
+                  style={{ display: 'none' }}
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                />
               </div>
             </div>
             <div className="profile-name">
