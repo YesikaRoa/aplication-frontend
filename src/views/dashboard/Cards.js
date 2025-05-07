@@ -18,7 +18,7 @@ const Cards = () => {
 
         // Get today's date
         const today = new Date()
-        today.setHours(0, 0, 0, 0)
+        today.setHours(23, 59, 59, 999) // Asegúrate de incluir todo el día de hoy
 
         // Calculate the start of the last month
         const lastMonth = new Date()
@@ -40,7 +40,7 @@ const Cards = () => {
           )
         }).length
 
-        // Filter confirmed appointments in the last week
+        // Filter confirmed appointments in the last week (including today)
         const newPatients = appointments.filter((appointment) => {
           const appointmentDate = new Date(appointment.scheduled_at)
           return (

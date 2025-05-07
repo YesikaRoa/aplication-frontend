@@ -1,9 +1,9 @@
 class Notifications {
-  static showAlert(setAlert, message, type = 'info') {
+  static showAlert(setAlert, message, type = 'info', duration = 3000) {
     setAlert({ message, type })
     setTimeout(() => {
       setAlert(null)
-    }, 3000)
+    }, duration) // Usa el parámetro de duración
   }
 }
 

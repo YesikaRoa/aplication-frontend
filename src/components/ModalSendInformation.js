@@ -1,7 +1,7 @@
 import React from 'react'
 import { CButton, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react'
 
-const ModalSendInformation = ({ visible, setVisible, title, message, onSend }) => {
+const ModalSendInformation = ({ visible, setVisible, title, message, onSend, children }) => {
   return (
     <CModal
       visible={visible}
@@ -13,6 +13,7 @@ const ModalSendInformation = ({ visible, setVisible, title, message, onSend }) =
       </CModalHeader>
       <CModalBody>
         <p>{message}</p>
+        {children} {/* Renderiza el contenido adicional pasado como hijos */}
       </CModalBody>
       <CModalFooter>
         <CButton
