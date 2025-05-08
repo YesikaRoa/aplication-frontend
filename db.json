@@ -86,7 +86,7 @@
     },
     {
       "id": "6",
-      "first_name": "Jorge",
+      "first_name": "Jorgee",
       "last_name": "Sánchez",
       "email": "jorge.sanchez@example.com",
       "password": "hashed_password_6",
@@ -94,7 +94,7 @@
       "phone": "0426100000",
       "birth_date": "1991-12-01",
       "gender": "M",
-      "avatar": "src/assets/images/avatars/6.jpg",
+      "avatar": "src/assets/images/avatars/2.jpg",
       "role_id": "Professional",
       "description": "Enfermero comprometido con el cuidado humanizado de pacientes.",
       "specialty": "Enfermero",
@@ -191,22 +191,6 @@
       "status": "Active",
       "created_at": "2025-05-05T22:32:17.879Z",
       "updated_at": "2025-05-05T22:32:17.879Z"
-    },
-    {
-      "id": "b4ff",
-      "first_name": "Yesika",
-      "last_name": "Roa",
-      "email": "yudarkiss14@gmail.com",
-      "password": "hashed_password_default",
-      "address": "Barrio Libertador",
-      "phone": "04127690828",
-      "birth_date": "14/02/2001",
-      "gender": "F",
-      "avatar": "/src/assets/images/avatars/avatar.png",
-      "role_id": "Admin",
-      "status": "Active",
-      "created_at": "2025-05-07T00:55:24.876Z",
-      "updated_at": "2025-05-07T00:55:24.876Z"
     }
   ],
   "appointments": [
@@ -413,23 +397,6 @@
       "ended_at": null,
       "pathology": "Hipertensión leve",
       "specialty": "Medicina General"
-    },
-    {
-      "id": "13",
-      "scheduled_at": "2025-05-05T14:30",
-      "rescheduled_at": "2025-04-25T14:30:00",
-      "status": "confirmed",
-      "canceled_at": "2025-04-17T09:00:00",
-      "notes": "Primera consulta para diagnóstico y orientación terapéutica.",
-      "patient": "Ernesto Pérez",
-      "professional": "Sofia Torres",
-      "has_medical_record": true,
-      "city": "La Grita",
-      "reason_for_visit": "Dermatología",
-      "category": "Especialidad médica",
-      "ended_at": null,
-      "pathology": "Dermatitis atópica",
-      "specialty": "Dermatología"
     }
   ]
 }
