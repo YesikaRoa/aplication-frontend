@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import UserFilter from '../../components/Filter'
 import ModalDelete from '../../components/ModalDelete'
 import ModalInformation from '../../components/ModalInformation'
@@ -12,7 +12,6 @@ import './styles/filter.css'
 import {
   CTable,
   CTableBody,
-  CTableHead,
   CTableRow,
   CTableHeaderCell,
   CTableDataCell,
@@ -281,7 +280,7 @@ export const Users = () => {
     setFilteredUsers(users)
   }
   useEffect(() => {
-    fetch('http://localhost:8000/users')
+    fetch('http://localhost:800/users')
       .then((res) => res.json())
       .then((data) => {
         const normalizedUsers = data.map((user) => ({
@@ -333,7 +332,7 @@ export const Users = () => {
                 <CTableHeaderCell className="table-header">Last name</CTableHeaderCell>
                 <CTableHeaderCell className="table-header">Email</CTableHeaderCell>
                 <CTableHeaderCell className="table-header">Rol</CTableHeaderCell>
-                <CTableHeaderCell className="table-header">Status</CTableHeaderCell>
+                < className="table-header">Status</>
                 <CTableHeaderCell className="avatar-header">Actions</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
